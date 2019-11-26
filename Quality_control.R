@@ -10,7 +10,6 @@ combined <- combined %>%
   select(Replicate.Name:Alignment.ID, Metabolite.name) %>%
   mutate(Run.Type = (tolower(str_extract(combined$Replicate.Name, "(?<=_)[^_]+(?=_)")))) 
 
-
 RT.table <- combined %>%
   filter(Run.Type == "std") %>%
   arrange(Metabolite.name) %>%
@@ -32,14 +31,14 @@ blank.table <- combined %>%
   unique()
 
 
-# Create datasets for different flag types.
+# Create datasets for different flag types --------------------------------
 SN.Area.Flags <- combined %>%
   arrange(Metabolite.name) %>%
   mutate(SN.Flag       = ifelse(((SN.Value) < SN.min), "SN.Flag", NA)) %>%
   mutate(Area.Min.Flag = ifelse((Area.Value < area.min), "Area.Min.Flag", NA))
 
-# Joining datasets---------------------------------------
 
+# Joining datasets---------------------------------------
 add.RT.Flag <- SN.Area.Flags %>%
   group_by(Metabolite.name) %>%
   left_join(RT.table, by = c("Metabolite.name", "Run.Type")) %>%
@@ -52,7 +51,7 @@ add.blk.Flag <- add.RT.Flag %>%
   select(-c("Blk.min", "Blk.max"))
 
 
-# Finally, combine all the flags.
+# Combine all the flags ---------------------------------------------------
 final.table <- add.blk.Flag %>%
   mutate(all.Flags      = paste(SN.Flag, Area.Min.Flag, RT.Flag, Blank.Flag, sep = ", ")) %>%
   mutate(all.Flags      = as.character(all.Flags %>% str_remove_all("NA, ") %>% str_remove_all("NA"))) %>%
@@ -62,8 +61,8 @@ final.table <- add.blk.Flag %>%
   ungroup(Metabolite.name) %>%
   mutate(Metabolite.name = as.character(Metabolite.name)) 
 
-# Print to file with comments and new name!
 
+# Print to file with comments and a new name ------------------------------
 Description <- c("Hello! Welcome to the world of MSDIAL QE Quality Control! ",
                  "Minimum area for a real peak: ",
                  "RT flexibility: ",

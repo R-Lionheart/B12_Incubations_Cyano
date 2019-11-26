@@ -6,7 +6,7 @@
 # Order function descriptions neatly at beginning of script.
 # Cleanly name items in the upload, rather than manually changing it to SN, RZ, etc.
 # Figure out a better way to choose columns out of MSDIAL
-# Add function documentation and comments to clarify the process.
+# Add comments to clarify the process.
 # Make function for always downloading the most up to date Ingalls lab standards.
 # Figure out a way to preserve the QC parameter values.
 # Fix the StandardizeVariables function
@@ -19,6 +19,14 @@ library(tidyr)
 options(scipen=999)
 
 SetHeader <- function(df) {
+  # Remove empty or unnecessary lines from machine output, and make column names headers.
+  #
+  # Args
+  #   df: Raw output file from MSDial.
+  #
+  # Returns
+  #   df: modified dataframe with correct headers and no empty lines.
+  #
   df <- df[!(is.na(df[1]) | df[1]==""), ]
   colnames(df) <- make.names(as.character(unlist(df[1,])))
   df <- df[-1, ]
@@ -26,15 +34,15 @@ SetHeader <- function(df) {
   return(df)
 }
 
-FilterUnknowns <- function(df) {
-  df <- df %>%  
-    filter(Metabolite.name != 'Unknown') %>%
-    select(-c(Average.Rt.min., Formula, Ontology, INCHIKEY, SMILES, Isotope.tracking.parent.ID, Isotope.tracking.weight.number, 
-              MS1.isotopic.spectrum, MS.MS.spectrum, Average.Mz, Post.curation.result, Fill.., Annotation.tag..VS1.0., RT.matched, 
-              m.z.matched, MS.MS.matched, Manually.modified, Total.score:Fragment.presence..))
-}
-
 RemoveCsv <- function(full.filepaths) {
+  # Remove a .csv file extension and obtain basename from a given list of filepaths.
+  #
+  # Args
+  #   Character strings of filepaths in a directory.
+  #
+  # Returns
+  #   Character strings of file basenames, without a csv extension.
+  #
   no.path <- substr(full.filepaths, 1, nchar(full.filepaths)-4)
   no.ID <-   gsub("\\_.*","", no.path)
   
@@ -42,6 +50,13 @@ RemoveCsv <- function(full.filepaths) {
 }
 
 ChangeClasses <- function(df) {
+  # Change specified columns from factors to numeric.
+  #
+  # Args
+  #   df: MSDial dataframe containing sample columns.
+  #
+  # Returns
+  #   df: MSDial dataframe, with specified columns changed to a numeric class. 
   for (i in c(10:ncol(df))) {
     df[, i] <- as.numeric(as.character(df[, i]))
   }
@@ -64,21 +79,16 @@ IdentifyRunTypes <- function(msdial.file) {
 
 TrimWhitespace <- function (x) gsub("^\\s+|\\s+$", "", x)
 
-StandardizeVariables <- function(df) {
-  if (c("ReplicateName", "AreaValue", "MZValue", "RTValue", "SNValue") %in% colnames(df))
-  {
-    df <- df %>%
-      rename(Replicate.Name = ReplicateName) %>%
-      rename(Area.Value = AreaValue) %>%
-      rename(MZ.Value = MZValue) %>%
-      rename(RT.Value = RTValue) %>%
-      rename(SN.Value = SNValue)
-  }
-  return(df)
-}
-
-
 IdentifyDuplicates <- function(df) {
+  # Determine which compounds are detected in both positive and negative HILIC runs.
+  # 
+  # Args
+  #   df: MSDial dataframe, containing all required parameters (MZ, SN, Area, etc),
+  #       and modified to long form instead of wide.
+  # 
+  # Returns
+  #   duplicates: Simple dataframe of listed compounds that have been identified as duplicates.
+  #
   duplicates <- df %>%
     group_by(Metabolite.name, Replicate.Name) %>%
     mutate(number = 1) %>%
@@ -89,37 +99,3 @@ IdentifyDuplicates <- function(df) {
     unique()
   return(duplicates)
 }
-
-
-# Do we need this function?
-CheckBlankMatcher <- function(blank.matcher) {
-  # Takes a blank matcher file and separates any multi-value variable
-  # columns into their own row.
-  #
-  # Args:
-  #   blank.matcher: CSV entered by user to match samples with
-  #   appropriate blanks.
-  #
-  # Returns:
-  #   blank.matcher: new CSV with any duplicate values separated
-  #   into their own rows.
-  #
-  blank.matcher <- do.call("rbind", Map(data.frame,
-                                        Blank.Name = strsplit(as.character(blank.matcher$Blank.Name), ","),
-                                        Replicate.Name = (blank.matcher$Replicate.Name))
-  )
-  blank.matcher <- blank.matcher[c(2, 1)]
-  
-  return(blank.matcher)
-}
-
-
-### OLD FUNCTIONS
-# IdentifyDuplicates <- function(df) {
-#   test <- which(duplicated(df$Compound.Name))
-#   duplicates <- as.data.frame(df$Compound.Name[test]) %>%
-#     rename(Compound.Name = 1) %>%
-#     arrange(Compound.Name)
-#   
-#   return(duplicates)
-# }
