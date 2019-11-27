@@ -1,15 +1,24 @@
 # Quality control script
+source("B12_Inc_Functions.R")
 
 area.min   <- 1000
 RT.flex    <- 0.4
 blk.thresh <- 0.3
 SN.min     <- 4
 
-msdial.runtypes <- IdentifyRunTypes(combined)
-combined <- combined %>%
-  select(Replicate.Name:Alignment.ID, Metabolite.name) %>%
-  mutate(Run.Type = (tolower(str_extract(combined$Replicate.Name, "(?<=_)[^_]+(?=_)")))) 
+pattern = "combined"
 
+# Import QC'd files and clean parameter data.
+filename <- RemoveCsv(list.files(path = 'data_processed/', pattern = pattern))
+filepath <- file.path('data_processed', paste(filename, ".csv", sep = ""))
+
+combined <- assign(make.names(filename), read.csv(filepath, stringsAsFactors = FALSE, header = TRUE)) %>%
+  select(Replicate.Name:Alignment.ID, Metabolite.name) %>%
+  mutate(Run.Type = (tolower(str_extract(Replicate.Name, "(?<=_)[^_]+(?=_)")))) 
+
+
+msdial.runtypes <- IdentifyRunTypes(combined)
+combined <- combined
 RT.table <- combined %>%
   filter(Run.Type == "std") %>%
   arrange(Metabolite.name) %>%
@@ -78,8 +87,6 @@ final.table <- bind_rows(df, final.table)
 rm(list = ls()[!ls() %in% c("final.table", lsf.str())])
 
 currentDate <- Sys.Date()
-csvFileName <- paste("data_processed/QC_Output_", currentDate, ".csv", sep = "")
+csvFileName <- paste("data_processed/QC_Cyano_Output_", currentDate, ".csv", sep = "")
 
 write.csv(final.table, csvFileName, row.names = FALSE)
-
-

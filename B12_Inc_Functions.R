@@ -17,6 +17,7 @@ library(stringr)
 library(tidyverse)
 library(tidyr)
 options(scipen=999)
+options(digits=3)
 
 SetHeader <- function(df) {
   # Remove empty or unnecessary lines from machine output, and make column names headers.

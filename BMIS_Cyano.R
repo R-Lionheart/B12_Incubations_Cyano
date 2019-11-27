@@ -10,26 +10,28 @@ source("B12_Inc_Functions.R")
 # Set parameters -----------------------------------------------------------------
 cut.off <- 0.3 # 30% decrease in RSD of pooled injections, aka improvement cutoff
 cut.off2 <- 0.1 # RSD minimum
+Column.Type = "RP"
+pattern = "QC"
 
 # Imports -----------------------------------------------------------------
 # Sample Key
-SampKey.all <- read.csv("data_extras/Sample.Key.HILIC.csv") %>%
+SampKey.all <- read.csv("data_extras/Sample.Key.CyanoAq.csv") %>%
   rename(Replicate.Name = Sample.Name) %>%
   mutate(Replicate.Name = Replicate.Name %>%
            str_replace("-","."))
 
 # Internal Standards
 Internal.Standards <- read.csv("data_extras/Ingalls_Lab_Standards.csv") %>%
-  filter(Column == "HILIC") %>%
+  filter(Column == Column.Type) %>%
   filter(Compound.Type == "Internal Standard")
 
 Internal.Standards$Compound.Name <- TrimWhitespace(Internal.Standards$Compound.Name)
 
-# QC'd HILIC output
-filename <- RemoveCsv(list.files(path = 'data_processed/', pattern = '*.csv'))
+# QC'd output
+filename <- RemoveCsv(list.files(path = 'data_processed/', pattern = pattern))
 filepath <- file.path('data_processed', paste(filename, ".csv", sep = ""))
 
-HILIC.QC <- assign(make.names(filename), read.csv(filepath, stringsAsFactors = FALSE, header = TRUE)) %>%
+Cyano.QC <- assign(make.names(filename), read.csv(filepath, stringsAsFactors = FALSE, header = TRUE)) %>%
   slice(-1:-6) %>%
   select(-c(Description, Value)) %>%
   filter(!str_detect(Replicate.Name, "Blk|Std")) %>%
@@ -37,42 +39,40 @@ HILIC.QC <- assign(make.names(filename), read.csv(filepath, stringsAsFactors = F
            str_replace("-",".")) 
 
 
-# Match QC'd HILIC data with Internal Standards list -----------------------------------------------------------------
-HILIC.withIS <- HILIC.QC %>%
+# Match QC'd data with Internal Standards list -----------------------------------------------------------------
+Cyano.withIS <- Cyano.QC %>%
   filter(Metabolite.name %in% Internal.Standards$Compound.Name)
 
-HILIC.NoIS <- HILIC.QC %>%
+Cyano.NoIS <- Cyano.QC %>%
   filter(!Metabolite.name %in% Internal.Standards$Compound.Name)
 
-# Create HILICs Internal Standard data -----------------------------------------------------------------
-HILIC.IS.data <- HILIC.withIS %>%
+# Create Cyanos Internal Standard data -----------------------------------------------------------------
+Cyano.IS.data <- Cyano.withIS %>%
   select(Replicate.Name, Metabolite.name, Area.with.QC) %>%
   mutate(Mass.Feature = Metabolite.name) %>%
   select(-Metabolite.name) 
-  #filter(!MassFeature == "Guanosine Monophosphate, 15N5")
 
 # Add injection volume -----------------------------------------------------------------
 # SHOULD THIS GO AT THE TOP
 SampKey <- SampKey.all %>%
-  filter(Replicate.Name %in% HILIC.IS.data$Replicate.Name) %>% 
+  filter(Replicate.Name %in% Cyano.IS.data$Replicate.Name) %>% 
   select(Replicate.Name, Bio.Normalization) %>%
   mutate(Mass.Feature = "Inj_vol",
          Area.with.QC = Bio.Normalization) %>%
   select(Replicate.Name, Area.with.QC, Mass.Feature)
 
 # Create Internal standard data to identify problematic compounds/replicates-----------------------------------------------------------------
-HILIC.IS.data <- rbind(HILIC.IS.data, SampKey) %>%
+Cyano.IS.data <- rbind(Cyano.IS.data, SampKey) %>%
   filter(!str_detect(Replicate.Name, "dda"))
-# HILIC.IS.data[] <- lapply(HILIC.IS.data, gsub, pattern = 'Neg|Pos', replacement = '')
+# Cyano.IS.data[] <- lapply(Cyano.IS.data, gsub, pattern = 'Neg|Pos', replacement = '')
 
 # Here is where we would hypothetically remove troublesome compounds.
 
-
 # Identify internal standards without an Area, i.e. any NA values.
-IS.Issues <- HILIC.IS.data[is.na(HILIC.IS.data$Area.with.QC), ]
+IS.Issues <- Cyano.IS.data[is.na(Cyano.IS.data$Area.with.QC), ]
 
 # Visualize raw areas of Internal Standards -----------------------------------------------------------------
-IS.Raw.Area.Plot <- ggplot(HILIC.IS.data, aes(x = Replicate.Name, y = Area.with.QC)) +
+IS.Raw.Area.Plot <- ggplot(Cyano.IS.data, aes(x = Replicate.Name, y = Area.with.QC)) +
   geom_bar(stat = "identity") +
   facet_wrap( ~Mass.Feature, scales = "free_y") +
   theme(axis.text.x = element_blank(),
@@ -84,59 +84,59 @@ IS.Raw.Area.Plot <- ggplot(HILIC.IS.data, aes(x = Replicate.Name, y = Area.with.
 
 
 # Edit data so names match-----------------------------------------------------------------
-HILIC.long  <- HILIC.NoIS %>%
+Cyano.long  <- Cyano.NoIS %>%
   rename(Mass.Feature = Metabolite.name) %>%
   select(Replicate.Name, Mass.Feature, Area.with.QC) %>%
   filter(!str_detect(Replicate.Name, "dda")) %>%
   arrange(Replicate.Name)
 
 # Test that names are equal across sample sets-----------------------------------------------------------------
-test_isdata <- as.data.frame(sort(unique(HILIC.IS.data$Replicate.Name)), stringsAsFactors = FALSE)
-test_long <- as.data.frame(sort(unique(HILIC.long$Replicate.Name)), stringsAsFactors = FALSE)
+test_isdata <- as.data.frame(sort(unique(Cyano.IS.data$Replicate.Name)), stringsAsFactors = FALSE)
+test_long <- as.data.frame(sort(unique(Cyano.long$Replicate.Name)), stringsAsFactors = FALSE)
 identical(test_isdata[[1]], test_long[[1]])
 
 # Caluclate mean values for each Internal Standard----------------------------------------------------------------
-HILIC.IS.means <- HILIC.IS.data %>%
+Cyano.IS.means <- Cyano.IS.data %>%
   filter(!grepl("_Blk_", Replicate.Name)) %>%
   mutate(Mass.Feature = as.factor(Mass.Feature)) %>%
   group_by(Mass.Feature) %>%
   summarise(Average.Area = mean(as.numeric(Area.with.QC), na.rm = TRUE)) %>%
   mutate(Mass.Feature = as.character(Mass.Feature))
 
-HILIC.IS.means[is.na(HILIC.IS.means)] <- NA
+Cyano.IS.means[is.na(Cyano.IS.means)] <- NA
 
 
 # Normalize to each internal Standard----------------------------------------------------------------
-HILIC.binded <- rbind(HILIC.IS.data, HILIC.long) %>%
+Cyano.binded <- rbind(Cyano.IS.data, Cyano.long) %>%
   arrange(Mass.Feature)
 
 Split_Dat <- list()
 
-for (i in 1:length(unique(HILIC.IS.data$Mass.Feature))) {
-  Split_Dat[[i]] <- HILIC.binded %>%
-    mutate(MIS = unique(HILIC.IS.data$Mass.Feature)[i]) %>%
-    left_join(HILIC.IS.data %>%
+for (i in 1:length(unique(Cyano.IS.data$Mass.Feature))) {
+  Split_Dat[[i]] <- Cyano.binded %>%
+    mutate(MIS = unique(Cyano.IS.data$Mass.Feature)[i]) %>%
+    left_join(Cyano.IS.data %>%
                 rename(MIS = Mass.Feature, IS_Area = Area.with.QC) %>%
                 select(MIS, Replicate.Name, IS_Area), by = c("Replicate.Name", "MIS")) %>%
-    left_join(HILIC.IS.means %>%
+    left_join(Cyano.IS.means %>%
                 rename(MIS = Mass.Feature), by = "MIS") %>%
     mutate(Adjusted.Area = Area.with.QC/IS_Area*Average.Area)
 }
 
-HILIC.area.norm <- do.call(rbind, Split_Dat) %>%
+Cyano.area.norm <- do.call(rbind, Split_Dat) %>%
   select(-IS_Area, -Average.Area)
 
 # Standardize name structure to: Date_type_ID_replicate_anythingextra) ----------------------------------------------------------------
-HILIC.mydata.new <- HILIC.area.norm %>%
+Cyano.mydata.new <- Cyano.area.norm %>%
   separate(Replicate.Name, c("runDate", "type", "SampID", "replicate"), "_") %>%
-  mutate(Run.Cmpd = paste(HILIC.area.norm$Replicate.Name, HILIC.area.norm$Mass.Feature))
+  mutate(Run.Cmpd = paste(Cyano.area.norm$Replicate.Name, Cyano.area.norm$Mass.Feature))
 
 
 # Find the B-MIS for each MassFeature----------------------------------------------------------------
 
 # Look only at the Pooled samples, to get a lowest RSD of the pooled possible (RSD_ofPoo),
 # then choose which IS reduces the RSD the most (Poo.Picked.IS)
-HILIC.poodat <- HILIC.mydata.new %>%
+Cyano.poodat <- Cyano.mydata.new %>%
   filter(type == "Poo") %>%
   group_by(SampID, Mass.Feature, MIS) %>%
   summarise(RSD_ofPoo_IND = sd(Adjusted.Area, na.rm = TRUE) / mean(Adjusted.Area, na.rm = TRUE)) %>%
@@ -146,13 +146,13 @@ HILIC.poodat <- HILIC.mydata.new %>%
   mutate(RSD_ofPoo = ifelse(RSD_ofPoo == "NaN", NA, RSD_ofPoo)) 
 
 
-HILIC.poodat <- HILIC.poodat %>%
-  left_join(HILIC.poodat %>% group_by(Mass.Feature) %>%
+Cyano.poodat <- Cyano.poodat %>%
+  left_join(Cyano.poodat %>% group_by(Mass.Feature) %>%
               summarise(Poo.Picked.IS = unique(MIS)[which.min(RSD_ofPoo)] [1]))
 
 
 # Get the original RSD, calculate RSD change, decide if MIS is acceptable----------------------------------------------------------------
-HILIC.poodat <- left_join(HILIC.poodat, HILIC.poodat %>%
+Cyano.poodat <- left_join(Cyano.poodat, Cyano.poodat %>%
                                filter(MIS == "Inj_vol" ) %>%
                                mutate(Orig_RSD = RSD_ofPoo) %>%
                                select(-RSD_ofPoo, -MIS)) %>%
@@ -166,34 +166,34 @@ HILIC.poodat <- left_join(HILIC.poodat, HILIC.poodat %>%
 # Adds a column that has the BMIS, not just Poo.Picked.IS
 # Changes the FinalBMIS to inject_volume if its no good
 
-HILIC.fixedpoodat <- HILIC.poodat %>%
+Cyano.fixedpoodat <- Cyano.poodat %>%
   filter(MIS == Poo.Picked.IS) %>% 
   mutate(FinalBMIS = ifelse(accept_MIS == "FALSE", "Inj_vol", Poo.Picked.IS)) %>%
   mutate(FinalRSD = RSD_ofPoo)
 
-HILIC.newpoodat <- HILIC.poodat %>%
-  left_join(HILIC.fixedpoodat %>% select(Mass.Feature, FinalBMIS)) %>%
+Cyano.newpoodat <- Cyano.poodat %>%
+  left_join(Cyano.fixedpoodat %>% select(Mass.Feature, FinalBMIS)) %>%
   filter(MIS == FinalBMIS) %>%
   mutate(FinalRSD = RSD_ofPoo)
 
-Try <- HILIC.newpoodat %>%
+Try <- Cyano.newpoodat %>%
   filter(FinalBMIS != "Inj_vol")
 
 QuickReport <- print(paste("% of MFs that picked a BMIS",
-                           length(Try$Mass.Feature) / length(HILIC.newpoodat$Mass.Feature),
+                           length(Try$Mass.Feature) / length(Cyano.newpoodat$Mass.Feature),
                            "RSD improvement cutoff", cut.off,
                            "RSD minimum cutoff", cut.off2,
                            sep = " "))
 
 
 # Evaluate and visualize the results of your BMIS cutoff----------------------------------------------------------------
-IS_toISdat <- HILIC.mydata.new %>%
-  filter(Mass.Feature %in% HILIC.IS.data$Mass.Feature) %>%
+IS_toISdat <- Cyano.mydata.new %>%
+  filter(Mass.Feature %in% Cyano.IS.data$Mass.Feature) %>%
   select(Mass.Feature, MIS, Adjusted.Area, type) %>%
   filter(type == "Smp") %>%
   group_by(Mass.Feature, MIS) %>%
   summarise(RSD_ofSmp = sd(Adjusted.Area, na.rm = TRUE)/mean(Adjusted.Area, na.rm = TRUE)) %>%
-  left_join(HILIC.poodat %>% select(Mass.Feature, MIS, RSD_ofPoo, accept_MIS))
+  left_join(Cyano.poodat %>% select(Mass.Feature, MIS, RSD_ofPoo, accept_MIS))
 
 injectONlY_toPlot <- IS_toISdat %>%
   filter(MIS == "Inj_vol")
@@ -210,21 +210,15 @@ print(ISTest_plot)
 # Return data that is normalized via BMIS----------------------------------------------------------------
 
 ## original
-HILIC.BMIS_normalizedData <- HILIC.newpoodat %>% select(Mass.Feature, FinalBMIS, Orig_RSD, FinalRSD) %>%
-  left_join(HILIC.mydata.new, by = "Mass.Feature") %>%
+Cyano.BMIS_normalizedData <- Cyano.newpoodat %>% select(Mass.Feature, FinalBMIS, Orig_RSD, FinalRSD) %>%
+  left_join(Cyano.mydata.new, by = "Mass.Feature") %>%
   filter(MIS == FinalBMIS) %>%
   unique()
 
 currentDate <- Sys.Date()
-csvFileName <- paste("data_processed/BMIS_Output_", currentDate, ".csv", sep = "")
+csvFileName <- paste("data_processed/BMIS_Cyano_Output_", currentDate, ".csv", sep = "")
 
 
-write.csv(HILIC.BMIS_normalizedData, csvFileName, row.names = FALSE)
+write.csv(Cyano.BMIS_normalizedData, csvFileName, row.names = FALSE)
 
 rm(list = ls())
-
-
-
-
-
-
