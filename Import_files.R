@@ -1,5 +1,3 @@
-# Actual script goes here
-
 source("B12_Inc_Functions.R")
 
 # Import all MSDial files --------------------------------------------------
@@ -36,7 +34,6 @@ for (df in seq_along(headers.set)) {
 }
 
 # Change variable classes -------------------------------------------------
-
 classes.changed <- lapply(names(headers.set), function(x) ChangeClasses(headers.set[[x]]))
 names(classes.changed) <- runs
 
@@ -45,42 +42,18 @@ list2env(classes.changed, globalenv())
 
 
 # Rearrange datasets ------------------------------------------------------
-
-SN_Cyano_B12.Incubations <- SN_Cyano_B12.Incubations %>%
-  tidyr::gather(
-    key = "Replicate.Name",
-    value = "SN.Value",
-    starts_with("X")) %>%
-  select(Replicate.Name, SN.Value, everything())
-
-RT_Cyano_B12.Incubations <- RT_Cyano_B12.Incubations %>%
-  tidyr::gather(
-    key = "Replicate.Name",
-    value = "RT.Value",
-    starts_with("X")) %>%
-  select(Replicate.Name, RT.Value, everything())
-
-Area_Cyano_B12.Incubations <- Area_Cyano_B12.Incubations %>%
-  tidyr::gather(
-    key = "Replicate.Name",
-    value = "Area.Value",
-    starts_with("X")) %>%
-  select(Replicate.Name, Area.Value, everything())
-
-Mz_Cyano_B12.Incubations <- Mz_Cyano_B12.Incubations %>%
-  tidyr::gather(
-    key = "Replicate.Name",
-    value = "MZ.Value",
-    starts_with("X")) %>%
-  select(Replicate.Name, MZ.Value, everything())
+Area_Cyano <- RearrangeDatasets(Area_Cyano_B12.Incubations, parameter = "Area.Value")
+Mz_Cyano <- RearrangeDatasets(Mz_Cyano_B12.Incubations, parameter = "Mz.Value")
+RT_Cyano <- RearrangeDatasets(RT_Cyano_B12.Incubations, parameter = "RT.Value")
+SN_Cyano <- RearrangeDatasets(SN_Cyano_B12.Incubations, parameter = "SN.Value")
 
 
 # Combine to one dataset --------------------------------------------------
-combined <- Area_Cyano_B12.Incubations %>%
-  left_join(Mz_Cyano_B12.Incubations) %>%
-  left_join(SN_Cyano_B12.Incubations) %>%
-  left_join(RT_Cyano_B12.Incubations) %>%
-  select(Replicate.Name, Area.Value, MZ.Value, RT.Value, SN.Value, everything()) %>%
+combined <- Area_Cyano %>%
+  left_join(Mz_Cyano) %>%
+  left_join(SN_Cyano) %>%
+  left_join(RT_Cyano) %>%
+  select(Replicate.Name, Area.Value, Mz.Value, RT.Value, SN.Value, everything()) %>%
   mutate(Metabolite.name = ifelse(str_detect(Metabolite.name, "Ingalls_"), sapply(strsplit(Metabolite.name, "_"), `[`, 2), Metabolite.name)) 
 
 combined$Replicate.Name <- gsub("^.{0,1}", "", combined$Replicate.Name)

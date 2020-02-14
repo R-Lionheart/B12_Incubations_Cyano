@@ -1,7 +1,6 @@
 # Things to Return --------------------------------------------------------
 source("B12_Inc_Functions.R")
 
-
 # IS_inspectPlot (plot to make sure there aren't any internal standards we should kick out)
 # QuickReport (% that picked BMIS, with cut off values)
 # ISTest_plot (plot to evaluate if you cut off is appropriate)
@@ -41,16 +40,16 @@ Cyano.QC <- assign(make.names(filename), read.csv(filepath, stringsAsFactors = F
 
 # Match QC'd data with Internal Standards list -----------------------------------------------------------------
 Cyano.withIS <- Cyano.QC %>%
-  filter(Metabolite.name %in% Internal.Standards$Compound.Name)
+  filter(Metabolite.Name %in% Internal.Standards$Compound.Name)
 
 Cyano.NoIS <- Cyano.QC %>%
-  filter(!Metabolite.name %in% Internal.Standards$Compound.Name)
+  filter(!Metabolite.Name %in% Internal.Standards$Compound.Name)
 
 # Create Cyanos Internal Standard data -----------------------------------------------------------------
 Cyano.IS.data <- Cyano.withIS %>%
-  select(Replicate.Name, Metabolite.name, Area.with.QC) %>%
-  mutate(Mass.Feature = Metabolite.name) %>%
-  select(-Metabolite.name) 
+  select(Replicate.Name, Metabolite.Name, Area.with.QC) %>%
+  mutate(Mass.Feature = Metabolite.Name) %>%
+  select(-Metabolite.Name) 
 
 # Add injection volume -----------------------------------------------------------------
 # SHOULD THIS GO AT THE TOP
@@ -85,7 +84,7 @@ IS.Raw.Area.Plot <- ggplot(Cyano.IS.data, aes(x = Replicate.Name, y = Area.with.
 
 # Edit data so names match-----------------------------------------------------------------
 Cyano.long  <- Cyano.NoIS %>%
-  rename(Mass.Feature = Metabolite.name) %>%
+  rename(Mass.Feature = Metabolite.Name) %>%
   select(Replicate.Name, Mass.Feature, Area.with.QC) %>%
   filter(!str_detect(Replicate.Name, "dda")) %>%
   arrange(Replicate.Name)

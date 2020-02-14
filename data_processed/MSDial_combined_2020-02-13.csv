@@ -1,4 +1,4 @@
-"Replicate.Name","Area.Value","MZ.Value","RT.Value","SN.Value","Alignment.ID","Metabolite.name","Adduct.type","MS.MS.assigned","Reference.RT","Reference.m.z","Comment","S.N.average","Spectrum.reference.file.name"
+"Replicate.Name","Area.Value","Mz.Value","RT.Value","SN.Value","Alignment.ID","Metabolite.name","Adduct.type","MS.MS.assigned","Reference.RT","Reference.m.z","Comment","S.N.average","Spectrum.reference.file.name"
 "171013_Blk_ProcessBlk_1",375453,104.071,0.7,4.557927,"290","Dimethyl glycine","[M+H]+","FALSE","0.7","104.07115","Good","74.41","171013_Std_250nMStdinH2O_2"
 "171013_Blk_ProcessBlk_1",522910,104.107,0.7,53.10018,"292","Choline","[M+H]+","TRUE","0.7","104.1074","Good","3445.94","171030_Poo_TruePooInc2_dda2"
 "171013_Blk_ProcessBlk_1",7829075,118.087,0.716,21.16492,"640","Betaine","[M+H]+","TRUE","0.719","118.0865","Good","301.63","171030_Poo_TruePooInc2_dda4"
