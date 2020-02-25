@@ -1,4 +1,4 @@
-# source("B12_Functions.R")
+source("B12_Inc_Functions.R")
 # source("src/biostats.R")
 options(scipen = 999)
 
@@ -80,5 +80,3 @@ Cyano_filtered <- Cyano_fixed %>%
   mutate(MF.Count = n()) %>%
   filter(!Missing > (percentMissing*MF.Count)) %>%
   select(-c("Missing", "MF.Count"))
-
-
