@@ -72,7 +72,7 @@ Cyano_fixed <- Cyano_all %>%
 all.cyano <- ggplot(Cyano_fixed, aes(x = reorder(Mass.Feature, -Adjusted.Area), y = Adjusted.Area)) +
   geom_bar(stat = "identity") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-print(all.cyano)
+#print(all.cyano)
 
 Cyano_filtered <- Cyano_fixed %>%
   group_by(Mass.Feature) %>%
