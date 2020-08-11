@@ -19,7 +19,27 @@ combined <- assign(make.names(filename), read.csv(filepath, stringsAsFactors = F
   mutate(Run.Type = (tolower(str_extract(Replicate.Name, "(?<=_)[^_]+(?=_)")))) %>%
   rename(Metabolite.Name = Metabolite.name)
 
+# # Quick KRH compound analysis
+KRH_compounds <- read.csv("data_extras/KRH_compounds.csv", stringsAsFactors = FALSE) %>%
+  select(X) %>%
+  rename(Metabolite.Name = X)
 
+for_anitra <- combined %>% filter(Metabolite.Name == "Coenzyme B12")
+ggplot(for_anitra, aes(x = Replicate.Name, y = Area.Value)) +
+  geom_bar(position="dodge", stat="identity") +
+  theme(axis.text.x = element_text(angle = 90)) +
+  ggtitle("Coenzyme B12 in Cyano Incubation")
+
+for_anitra_all <- combined %>% filter(Metabolite.Name %in% KRH_compounds$Metabolite.Name)
+ggplot(for_anitra_all, aes(x = Replicate.Name, y = Area.Value)) +
+  geom_bar(position = "dodge", stat="identity", aes(color = Metabolite.Name)) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  facet_grid(Metabolite.Name ~ ., scales = "free_y") + theme(legend.position = "none") +
+  ggtitle("KRH Compounds in Cyano Incubation")
+
+
+
+## Continue analysis
 msdial.runtypes <- IdentifyRunTypes(combined)
 
 RT.table <- combined %>%

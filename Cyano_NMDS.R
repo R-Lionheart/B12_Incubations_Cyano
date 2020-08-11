@@ -72,9 +72,14 @@ Cyano_fixed <- Cyano_all %>%
 Cyano_fixed$Mass.Feature <- factor(Cyano_fixed$Mass.Feature, levels=unique(Cyano_fixed$Mass.Feature))
 all.cyano <- ggplot(Cyano_fixed, aes(x = Mass.Feature, y = Adjusted.Area)) +
   geom_bar(stat = "identity") +
+<<<<<<< HEAD
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
   ggtitle("B12 Incubations: Raw Cyano Area")
 print(all.cyano)
+=======
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+#print(all.cyano)
+>>>>>>> c1d3a2f1e82dde1da96f937d7fb47c984023f0cd
 
 Cyano_filtered <- Cyano_fixed %>%
   group_by(Mass.Feature) %>%
