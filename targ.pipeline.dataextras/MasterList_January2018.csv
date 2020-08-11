@@ -1,0 +1,304 @@
+Group,Compound Name ,Parent ,Daughter,Retention Time,Parent Charge,Daughter Charge,Notes,Function Number ,Cone Voltage,Collision Energy,Quan Trace,2nd trace
+Amino Acid,Phenylalanine,166.0958,103.1556,1.15,1,1,,30,24,22,no,yes
+Amino Acid,Phenylalanine,166.0958,120.1383,1.15,1,1,,30,24,12,yes,
+Amino Acid,Tryptophan,188.068,118.053,2.07,1,1,,43,32,20,yes,
+Amino Acid,Tryptophan,188.068,91.069,2.07,1,1,,43,32,28,no,yes
+Amino Acid,Kynurenine,209.1119,94.2148,1.27,1,1,added to MS method on 5/23/16,56,32,14,no,yes
+Amino Acid,Kynurenine,209.1119,192.1701,1.27,1,1,added to MS method on 5/23/16,56,32,8,yes,
+Amino Acid derivative,Dimethyl glycine,104.0242,44.1023,0.69,1,1,Added new transition,2,18,24,no,yes
+Amino Acid derivative,Dimethyl glycine,104.0242,58.1401,0.69,1,1,Added new transition,2,18,10,yes,
+Amino Acid synthesis,Adenosyl Homocysteine,385.152,136.125,0.96,1,1,,109,10,18,yes,
+Amino Acid synthesis,Adenosyl Homocysteine,385.152,88.1235,0.96,1,1,,109,10,20,no,yes
+Amino Acid synthesis,Adenosyl Methionine,399.226,250.175,0.71,1,1,,112,2,14,yes,
+Amino Acid synthesis,Adenosyl Methionine,399.2258,136.117,0.71,1,1,,112,2,26,no,yes
+Amino sugar,Chitobiose,425.1128,126.2047,0.74,1,1,added to MS method on 5/23/16,117,2,22,no,yes
+Amino sugar,Chitobiose,425.1128,204.219,0.74,1,1,added to MS method on 5/23/16,117,2,10,yes,
+Antibiotic,Monesin,693.504,675.468,11.79,1,1,,127,2,40,yes,
+Antibiotic,Monesin,693.504,461.3531,11.79,1,1,,127,2,52,no,yes
+Antibiotic,Tropodithietic acid,213.027,195.067,6.47,1,1,,56,44,12,yes,
+Antibiotic,Tropodithietic acid,213.0265,151.0282,6.47,1,1,,56,44,22,no,yes
+Antioxidant,Glutathione,308.112,179.116,0.87,1,1,,96,22,10,yes,
+Antioxidant,Glutathione,308.112,162.075,0.87,1,1,,96,22,14,no,yes
+Antioxidant pigment,Carotene,536.521,444.503,16.42,1,1,,120,36,14,yes,
+Antioxidant pigment,Carotene,536.521,105.134,16.42,1,1,,120,36,58,no,
+Antioxidant pigment,Carotene,536.521,119.18,16.42,1,1,,120,36,36,no,yes
+Circadian,Melatonin,233.184,174.191,6.51,1,1,,64,24,18,yes,
+Circadian,Melatonin,233.184,159.101,6.51,1,1,,64,24,26,no,yes
+Circadian,Melatonin,233.184,130.81,6.51,1,1,,64,24,34,no,
+Fatty Acid,Arachidonic Acid,305.296,93.172,12.15,1,1,,94,60,30,no,yes
+Fatty Acid,Arachidonic Acid,305.296,121.142,12.15,1,1,,94,60,20,yes,
+Fatty Acid,DHA,329.296,91.157,12.23,1,1,,100,20,50,no,yes
+Fatty Acid,DHA,329.296,105.144,12.23,1,1,,100,20,34,yes,
+Fatty Acid,EPA,303.266,105.137,12.095,1,1,,93,4,36,no,yes
+Fatty Acid,EPA,303.266,119.184,12.095,1,1,,93,4,24,yes,
+Internal Std,d4-Tryptamine,165.132,148.2033,2.55,1,1,,28,18,10,yes,
+Internal Std,d4-Tryptamine,165.132,120.956,2.55,1,1,,28,18,22,no,yes
+Internal Std,d-IAA,181.124,133.962,5.355,1,1,,41,28,16,yes,
+Internal Std,d-IAA,181.124,106.3732,5.355,1,1,,41,28,28,no,yes
+Internal Std,D-Phenylalanine,174.1442,128.0801,1.15,1,1,,37,26,14,yes,
+Internal Std,D-Phenylalanine,174.1442,108.5517,1.15,1,1,,37,26,26,no,yes
+Internal Std,D-Tryptophan,191.168,119.146,2.23,1,1,,46,22,18,yes,
+Internal Std,D-Tryptophan,191.168,92.0825,2.23,1,1,,46,22,32,no,yes
+Internal Std,Vitamin B1_IS,269.196,122.139,0.69,1,1,,80,2,12,yes,
+Internal Std,Vitamin B1_IS,269.196,148.0805,0.69,1,1,,80,2,12,no,yes
+Internal Std,Vitamin B2_IS,383.204,249.153,4.39,1,1,,108,2,22,yes,
+Internal Std,Vitamin B2_IS,383.204,175.111,4.39,1,1,,108,2,34,no,yes
+Internal Std,D3-Pyridoxal,171.1957,97.1493,0.94,1,1,added to MS method on 3/3/2017,,34,22,no,yes
+Internal Std,D3-Pyridoxal,171.1957,153.0865,0.94,1,1,added to MS method on 3/3/2017,,34,12,yes,
+Lignin,4-hydroxybenzaldehyde,121.024,121.085,3.775,-1,-1,,134,38,12,no,yes
+Lignin,4-hydroxybenzaldehyde,121.024,92.091,3.775,-1,-1,,134,38,22,yes,
+Lignin,Acetosyringone,197.068,155.177,5.765,1,1,,49,44,6,yes,
+Lignin,Acetosyringone,197.068,140.1,5.765,1,1,,49,44,6,no,yes
+Lignin,Acetovanillone,167.084,43.15,5.38,1,1,,31,26,10,yes,
+Lignin,Acetovanillone,167.084,125.21,5.38,1,1,,31,26,8,no,yes
+Lignin,Acetovanillone,167.084,110.14,5.38,1,1,,31,26,18,no,
+Lignin,Aminobenzoic Acid,138.072,94.174,2,1,1,,13,6,12,no,yes
+Lignin,Aminobenzoic Acid,138.072,77.139,2,1,1,,13,6,16,yes,
+Lignin,Caffeic Acid,179.064,135.077,4.83,-1,-1,,139,38,16,yes,
+Lignin,Caffeic Acid,179.064,107.041,4.83,-1,-1,,139,38,22,no,yes
+Lignin,Caffeic Acid,179.064,79.07,4.83,-1,-1,,139,2,24,no,
+Lignin,Dihydroxybenzoic acid,152.988,109.034,2.55,-1,-1,,136,28,14,yes,
+Lignin,Dihydroxybenzoic acid,152.988,91.032,2.55,-1,-1,,136,28,22,no,
+Lignin,Dihydroxybenzoic acid,152.988,81.02,2.55,-1,-1,,136,28,20,no,yes
+Lignin,Ethyl 3 aminobenzoate,166.096,138.097,3.365,1,1,,29,56,16,yes,
+Lignin,Ethyl 3 aminobenzoate,166.096,77.126,3.365,1,1,,29,56,24,no,yes
+Lignin,Ferulic Acid,195.082,177.116,5.97,1,1,,47,2,10,yes,
+Lignin,Ferulic Acid,195.082,145.107,5.97,1,1,,47,2,16,no,yes
+Lignin,p-Coumaric Acid,165.072,147.101,5.385,1,1,,27,22,10,yes,
+Lignin,p-Coumaric Acid,165.072,119.068,5.385,1,1,,27,22,18,no,yes
+Lignin,Sinaptic Acid,225.104,207.153,5.985,1,1,,61,2,8,yes,
+Lignin,Sinaptic Acid,225.104,175.152,5.985,1,1,,61,2,14,no,yes
+Lignin,Syringaldehyde,183.074,95.18,5.48,1,1,,42,2,14,no,
+Lignin,Syringaldehyde,183.074,123.095,5.48,1,1,,42,2,10,yes,
+Lignin,Syringaldehyde,183.074,77.18,5.48,1,1,,42,2,20,no,yes
+Lignin,Syringaldehyde,183.074,155.17,5.48,1,1,,42,2,8,no,
+Lignin,Syringic Acid,199.018,140.099,4.88,1,1,,50,18,12,yes,
+Lignin,Syringic Acid,199.018,155.176,4.88,1,1,,50,18,6,no,yes
+Lignin,Syringic Acid,199.018,125.15,4.88,1,1,,50,18,24,no,
+Lignin,trans cinnamic acid,131.008,103.184,6.2,1,1,,10,14,12,yes,
+Lignin,trans cinnamic acid,131.008,77.185,6.2,1,1,,10,14,20,no,yes
+Lignin,Vanillic Acid,169.054,93.12,4.115,1,1,,33,22,14,no,yes
+Lignin,Vanillic Acid,169.054,125.126,4.115,1,1,,33,22,10,yes,
+Lignin,Vanillin,153.008,93.126,4.69,1,1,,18,22,14,yes,
+Lignin,Vanillin,153.008,125.138,4.69,1,1,,18,22,10,no,yes
+Phospholipid synthesis,Phosphocholine,760.702,184.17,14.9,1,1,,129,100,24,yes,
+Phospholipid synthesis,Phosphocholine,760.702,86.169,14.9,1,1,,129,100,24,no,yes
+Phospholipid synthesis,Phosphoethanolamine,746.66,605.699,14.1,1,1,,128,44,20,yes,
+Phospholipid synthesis,Phosphoethanolamine,746.66,265.305,14.1,1,1,,128,44,30,no,yes
+Phytohormone,2iP,202.08,133.904,4.18,-1,-1,,140,32,14,yes,
+Phytohormone,2iP,202.08,141.896,4.18,-1,-1,,140,32,10,no,yes
+Phytohormone,3 Indolebutyric Acid,204.122,186.098,7.45,1,1,,54,20,14,yes,
+Phytohormone,3 Indolebutyric Acid,204.122,130.083,7.45,1,1,,54,20,22,no,yes
+Phytohormone,3 Indolepropionic Acid,190.1019,130.1228,6.66,1,1,,44,2,18,yes,
+Phytohormone,3 Indolepropionic Acid,190.1019,172.1405,6.66,1,1,,44,2,12,no,yes
+Phytohormone,3-Indoleacetonitrile,157.077,130.126,7.09,1,1,,23,24,12,yes,
+Phytohormone,3-Indoleacetonitrile,157.077,117.1182,7.09,1,1,,23,24,20,no,yes
+Phytohormone,Abscisic Acid,247.168,229.228,6.7,1,1,,69,26,10,yes,
+Phytohormone,Abscisic Acid,247.168,187.219,6.7,1,1,,69,26,14,no,yes
+Phytohormone,Camalexin,201.068,59.086,6.96,1,1,,52,4,26,yes,
+Phytohormone,Camalexin,201.068,142.269,6.96,1,1,,52,4,28,no,yes
+Phytohormone,DHZ,220.037,133.844,2.01,-1,-1,,142,48,20,yes,
+Phytohormone,DHZ,220.037,220.498,2.01,-1,-1,,142,48,20,no,yes
+Phytohormone,GA3,345.083,239.128,5.16,-1,-1,,146,4,14,no,yes
+Phytohormone,GA3,345.083,143.057,5.16,-1,-1,,146,4,30,yes,
+Phytohormone,GA4,331.132,257.085,8.18,-1,-1,,144,6,22,no,yes
+Phytohormone,GA4,331.132,243.11,8.18,-1,-1,,144,6,18,yes,
+Phytohormone,IAA,176.1042,103.1031,5.41,1,1,updated transition,36,18,28,no,yes
+Phytohormone,IAA,176.1042,130.0716,5.41,1,1,updated transition,36,18,14,yes,
+Phytohormone,Indole 3 acetamide,175.104,130.072,4.02,1,1,,38,4,16,yes,
+Phytohormone,Indole 3 acetamide,175.104,158.11,4.02,1,1,,38,4,6,no,yes
+Phytohormone,Indole 3 carboxylic acid,162.068,118.148,5.44,1,1,,26,24,12,yes,
+Phytohormone,Indole 3 carboxylic acid,162.068,144.1,5.44,1,1,,26,24,12,no,yes
+Phytohormone,Indole 3 Lactic Acid,206.102,118.092,4.65,1,1,,55,10,22,yes,
+Phytohormone,Indole 3 Lactic Acid,206.102,130.187,4.65,1,1,,55,10,26,no,yes
+Phytohormone,Indole 3 methyl acetate,190.1022,103.13,7.31,1,1,,45,2,32,no,yes
+Phytohormone,Indole 3 methyl acetate,190.1022,130.06,7.31,1,1,,45,2,16,yes,
+Phytohormone,Kinetin,216.14,81.085,3.37,1,1,,59,2,16,yes,
+Phytohormone,Kinetin,216.14,148.0942,3.37,1,1,,59,2,14,no,yes
+Phytohormone,Methyl indole 3 carboxylate,176.084,144.127,7.25,1,1,,40,22,12,yes,
+Phytohormone,Methyl indole 3 carboxylate,176.084,116.28,7.25,1,1,,40,22,22,no,yes
+Phytohormone,Tryptamine,161.124,144.124,2.55,1,1,,24,12,10,yes,
+Phytohormone,Tryptamine,161.124,117.127,2.55,1,1,,24,12,22,no,yes
+Phytohormone,Tryptophol,162.04,144.129,5.33,1,1,,25,2,14,yes,
+Phytohormone,Tryptophol,162.04,117.1306,5.33,1,1,,25,2,20,no,yes
+Phytohormone,Zeatin,218.104,188.071,2.02,-1,-1,,141,42,16,no,yes
+Phytohormone,Zeatin,218.104,133.851,2.02,-1,-1,,141,42,18,yes,
+Phytohormone,Indole 3 Pyruvic Acid,202.0404,158.0121,7.01,-1,-1,added to MS method on 5/24/16,134,26,10,no,yes
+Phytohormone,Indole 3 Pyruvic Acid,202.0404,173.9998,7.01,-1,-1,added to MS method on 5/24/16,134,26,8,yes,
+PUA,"2, 4 decadienal",153.1,83.12,9.855,1,1,,21,20,14,yes,
+PUA,"2, 4 decadienal",153.1,97.1,9.855,1,1,,21,20,12,no,yes
+PUA,"2, 4 decadienal",153.1,55.2,9.855,1,1,,21,18,20,no,
+PUA,"2,4 octadienal",125.084,55.12,7.23,1,1,,9,28,16,no,yes
+PUA,"2,4 octadienal",125.0842,83.16,7.23,1,1,,9,28,12,yes,
+Purine,Caffeine,195.112,138.109,3.85,1,1,,48,22,16,yes,
+Purine,Caffeine,195.112,110.1314,3.85,1,1,,48,22,24,no,yes
+Purine,Xanthine,153.014,110.111,1.11,1,1,in cyano Mix#4,19,28,16,yes,
+Purine,Xanthine,153.014,136.009,1.11,1,1,in cyano Mix#4,19,28,16,no,yes
+Quinone,Coenzyme Q1,251.16,219.17,9.35,1,1,,72,36,14,yes,
+Quinone,Coenzyme Q1,251.16,91.1613,9.35,1,1,,72,36,36,no,yes
+Quinone,Coenzyme Q10,863.887,197.143,16.61,1,1,,132,64,36,yes,
+Quinone,Coenzyme Q10,863.887,95.177,16.61,1,1,,132,64,56,no,yes
+Quinone,Vitamin K1,451.457,187.136,14.78,1,1,,119,46,20,yes,
+Quinone,Vitamin K1,451.457,128.151,14.78,1,1,,119,46,70,no,yes
+Quinone,Vitamin K2,445.394,187.153,14.14,1,1,,118,6,20,yes,
+Quinone,Vitamin K2,445.394,95.186,14.14,1,1,,118,6,26,no,yes
+Quorum sensing,3OC10-HSL,270.244,102.08,8.255,1,1,,82,2,10,yes,
+Quorum sensing,3OC10-HSL,270.2442,169.1989,8.255,1,1,,82,2,12,no,yes
+Quorum sensing,3OC10-HSL,270.2442,57.07,8.255,1,1,,82,2,24,no,
+Quorum sensing,3OC10-HSL,270.2442,74.11,8.255,1,1,,82,2,20,no,
+Quorum sensing,3OC12-HSL,298.24,102.115,9.75,1,1,,88,30,10,yes,
+Quorum sensing,3OC12-HSL,298.2404,197.2027,9.75,1,1,,88,30,10,no,yes
+Quorum sensing,3OC12-HSL,298.2404,270.3,9.75,1,1,,88,30,10,no,
+Quorum sensing,3OC6-HSL,214.16,102.181,1.96,1,1,,57,10,8,yes,
+Quorum sensing,3OC6-HSL,214.1596,113.1769,1.96,1,1,,57,10,14,no,yes
+Quorum sensing,3OC8-HSL,242.057,102.203,5.28,1,1,in cyano Mix#4,65,42,6,yes,
+Quorum sensing,3OC8-HSL,242.057,141.199,5.28,1,1,in cyano Mix#4,65,42,10,no,yes
+Quorum sensing,3OHC12-HSL,300.287,102.117,9.275,1,1,,89,8,10,yes,
+Quorum sensing,3OHC12-HSL,300.2873,282.2907,9.275,1,1,,89,8,8,no,yes
+Quorum sensing,C10-HSL,256.2681,102.1167,9.21,1,1,,76,18,10,yes,
+Quorum sensing,C10-HSL,256.2681,137.243,9.21,1,1,,76,18,12,no,
+Quorum sensing,C10-HSL,256.2681,155.1983,9.21,1,1,,76,18,10,no,yes
+Quorum sensing,C10-HSL,256.2681,238.2608,9.21,1,1,,76,18,10,no,
+Quorum sensing,C12-HSL,284.2658,102.1558,10.35,1,1,,84,10,10,yes,
+Quorum sensing,C12-HSL,284.2658,183.2712,10.35,1,1,,84,10,10,no,yes
+Quorum sensing,C14-HSL,312.3,102.115,11.4,1,1,,98,2,12,yes,
+Quorum sensing,C14-HSL,312.3004,211.2569,11.4,1,1,,98,2,10,no,yes
+Quorum sensing,C14-HSL,312.3004,294.31,11.4,1,1,,98,2,10,no,
+Quorum sensing,C4-HSL,172.132,102.176,1.47,1,1,,36,10,8,yes,
+Quorum sensing,C4-HSL,172.1319,71.1386,1.47,1,1,,36,10,12,no,yes
+Quorum sensing,C6-HSL,200.138,102.133,4.06,1,1,,51,14,8,yes,
+Quorum sensing,C6-HSL,200.1381,99.2024,4.06,1,1,,51,14,10,no,yes
+Quorum sensing,C8-HSL,228.202,102.151,7.36,1,1,,62,24,8,yes,
+Quorum sensing,C8-HSL,228.202,127.1958,7.36,1,1,,62,24,10,no,yes
+Quorum sensing,cinnamoyl-HSL,232.16,131.097,6.425,1,1,,63,10,12,no,
+Quorum sensing,cinnamoyl-HSL,232.1596,103.129,6.425,1,1,,63,10,30,yes,
+Quorum sensing,cinnamoyl-HSL,232.1596,77.11,6.425,1,1,,63,10,40,no,yes
+Quorum sensing,HHQ,244.244,159.103,11.02,1,1,,66,54,30,yes,
+Quorum sensing,HHQ,244.2442,172.1767,11.02,1,1,,66,54,32,no,yes
+Quorum sensing,p-Coumoroyl-HSL,248.154,147.135,5.46,1,1,,71,2,10,yes,
+Quorum sensing,p-Coumoroyl-HSL,248.1542,91.15,5.46,1,1,,71,2,36,no,
+Quorum sensing,p-Coumoroyl-HSL,248.1542,119.16,5.46,1,1,,71,2,28,no,yes
+Sterol,7-dehydrocholesterol,367.394,145.145,13.89,1,1,,105,2,20,yes,
+Sterol,7-dehydrocholesterol,367.394,159.192,13.89,1,1,,105,2,20,no,yes
+Sterol,7-dehydrocholesterol,367.394,105.14,13.89,1,1,,105,2,42,no,
+Sterol,Cholesterol,387.2766,331.26,8.5,1,1,not in a mix ,110,26,16,no,
+Sterol,Cholesterol,387.2766,175.058,8.5,1,1,not in a mix ,110,26,30,yes,
+Sterol,Cholesterol,387.2766,105.14,8.5,1,1,not in a mix ,110,26,16,no,yes
+Sterol,Ergosterol,379.415,105.14,13.76,1,1,,107,28,38,no,yes
+Sterol,Ergosterol,379.415,145.1407,13.76,1,1,,107,28,26,yes,
+Sterol precursor,Squalene,411.479,95.178,15.02,1,1,,113,34,26,yes,
+Sterol precursor,Squalene,411.479,149.159,15.02,1,1,,113,34,24,no,yes
+Toxin ,Domoic Acid,312.226,161.108,2.72,1,1,,97,76,18,yes,
+Toxin ,Domoic Acid,312.226,248.194,2.72,1,1,,97,76,14,no,yes
+Trouble Compounds,Indole 3 carbinol,146.0281,41.9989,3.85,-1,-1,this transition is not good,130,6,20,no,yes
+Trouble Compounds,Indole 3 carbinol,146.0281,128.1459,3.85,-1,-1,small peak on cyano method,130,6,12,yes,
+Trouble Compounds,Trolox,249.194,176.108,7,-1,-1,not in a mix ,143,50,22,yes,
+Trouble Compounds,Trolox,249.194,205.241,7,-1,-1,not in a mix ,143,50,16,no,yes
+Trouble Compounds,Creatine,132.096,90.149,0.71,1,1,"yes, better on HILIC",11,2,12,yes,
+Trouble Compounds,Creatine,132.096,44.137,0.71,1,1,"yes, better on HILIC",11,2,12,no,yes
+Trouble Compounds,Retinol,269.266,107.154,8.19,1,1,std degrades,81,30,18,yes,
+Trouble Compounds,Retinol,269.266,93.168,8.19,1,1,std degrades,81,30,18,no,yes
+Trouble Compounds,Roseobacticide A,285.0585,238.1,8.5,1,1,ask Laura H,85,20,20,,
+Trouble Compounds,Roseobacticide A,285.0585,257.1,8.5,1,1,ask Laura H,85,20,20,,
+Trouble Compounds,Roseobacticide B,269.0637,222.1,9,1,1,ask Laura H,79,20,20,,
+Trouble Compounds,Roseobacticide B,269.0637,241.1,9,1,1,ask Laura H,79,20,20,,
+Trouble Compounds,Roseobacticide B,269.0637,254.1,9,1,1,ask Laura H,79,20,30,,
+Trouble Compounds,Roseobacticide C,308.0745,233.0841,10,1,1,ask Laura H,95,20,20,,
+Trouble Compounds,Roseobacticide C,308.0745,260.0712,10,1,1,ask Laura H,95,20,20,,
+Trouble Compounds,Roseobacticide C,308.0745,280.08,10,1,1,ask Laura H,95,20,20,,
+Trouble Compounds,Roseobacticide D,317.0307,242.0402,10,1,1,ask Laura H,99,20,20,,
+Trouble Compounds,Roseobacticide D,317.0307,270.0351,10,1,1,ask Laura H,99,20,20,,
+Trouble Compounds,Roseobacticide D,317.0307,289.04,10,1,1,ask Laura H,99,20,20,,
+Trouble Compounds,Roseobacticide E,301.0358,222.0675,10,1,1,ask Laura H,90,50,30,,
+Trouble Compounds,Roseobacticide E,301.0358,226.0447,10,1,1,ask Laura H,90,50,20,,
+Trouble Compounds,Roseobacticide E,301.0358,254.04,10,1,1,ask Laura H,90,50,20,,
+Trouble Compounds,Roseobacticide E,301.0358,286.01,10,1,1,ask Laura H,90,50,20,,
+Trouble Compounds,Roseobacticide F,340.0467,261.079,11,1,1,ask Laura H,101,50,30,,
+Trouble Compounds,Roseobacticide F,340.0467,293.051,11,1,1,ask Laura H,101,50,30,,
+Trouble Compounds,Roseobacticide F,340.0467,325.02,11,1,1,ask Laura H,101,20,20,,
+Trouble Compounds,Roseobacticide G,363.0692,194.0732,9,1,1,ask Laura H,104,50,30,,
+Trouble Compounds,Roseobacticide G,363.0692,209.0603,9,1,1,ask Laura H,104,20,20,,
+Trouble Compounds,Roseobacticide G,363.0692,237.06,9,1,1,ask Laura H,104,30,30,,
+Trouble Compounds,Roseobacticide G,363.0692,275.04,9,1,1,ask Laura H,104,30,30,,
+Trouble Compounds,Roseobacticide H,347.0743,210.0681,11,1,1,ask Laura H,103,20,20,,
+Trouble Compounds,Roseobacticide H,347.0743,238.063,11,1,1,ask Laura H,103,20,20,,
+Trouble Compounds,Roseobacticide H,347.0743,335.07,11,1,1,ask Laura H,103,20,20,,
+Trouble Compounds,Roseobacticide I,303.0327,222.0682,11,1,1,ask Laura H,92,20,20,yes,
+Vitamin,Desthiobiotin,215.16,197.203,4.5,1,1,,58,32,12,yes,
+Vitamin,Desthiobiotin,215.16,179.187,4.5,1,1,,58,32,18,no,yes
+Vitamin,Pyridoxal,168.082,94.134,0.86,1,1,,32,18,20,yes,
+Vitamin,Pyridoxal,168.082,122.119,0.86,1,1,,32,18,18,no,yes
+Vitamin,Pyridoxal Phosphate,248.04,150.158,0.78,1,1,,70,36,16,yes,
+Vitamin,Pyridoxal Phosphate,248.04,94.152,0.78,1,1,,70,36,28,no,yes
+Vitamin,Pyridoxamine,169.112,134.084,0.65,1,1,,34,20,20,yes,
+Vitamin,Pyridoxamine,169.112,77.142,0.65,1,1,,34,20,30,no,yes
+Vitamin,Sulfurol,144.072,65.0438,1,1,1,not in mix ,14,46,20,no,yes
+Vitamin,Sulfurol,144.072,113.069,1,1,1,not in mix ,14,46,18,yes,
+Vitamin,Vitamin B1,265.104,122.138,0.69,1,1,,78,6,12,yes,
+Vitamin,Vitamin B1,265.104,144.1133,0.69,1,1,,78,6,10,no,yes
+Vitamin,Vitamin B2,377.196,243.157,4.39,1,1,,106,6,22,yes,
+Vitamin,Vitamin B2,377.196,172.1142,4.39,1,1,,106,6,38,no,yes
+Vitamin,Vitamin B3,123.998,53.069,0.88,1,1,Also looks good on HILIC,8,18,22,yes,
+Vitamin,Vitamin B3,123.998,80.536,0.88,1,1,Also looks good on HILIC,8,18,18,no,yes
+Vitamin,Vitamin B5,220.142,90.153,1.17,1,1,,60,20,12,yes,
+Vitamin,Vitamin B5,220.142,184.1641,1.17,1,1,,60,20,12,no,yes
+Vitamin,Vitamin B6,170.132,134.118,0.88,1,1,,35,2,18,yes,
+Vitamin,Vitamin B6,170.132,79.559,0.88,1,1,,35,2,28,no,yes
+Vitamin,Vitamin B7,245.132,97.107,3.75,1,1,,67,4,28,yes,
+Vitamin,Vitamin B7,245.132,123.0482,3.75,1,1,,67,4,26,no,yes
+Vitamin,Vitamin B9,295.186,120.129,4.51,1,1,,87,48,20,no,yes
+Vitamin,Vitamin B9,295.186,176.13,4.51,1,1,,87,48,22,yes,
+Vitamin (B1-derivative),Thiamine monophosphate,345.14,122.113,0.67,1,1,,102,2,12,yes,
+Vitamin (B1-derivative),Thiamine monophosphate,345.14,126.0801,0.67,1,1,,102,2,26,no,yes
+Vitamin (B1-derivative),thiamine pyrophosphate,425.1681,122.112,0.67,1,1,,115,18,20,yes,
+Vitamin (B1-derivative),thiamine pyrophosphate,425.1681,304.0697,0.67,1,1,,115,18,14,no,yes
+Vitamin (B-like),Choline,104.0881,45.0787,0.69,1,1,Added new transition,3,2,14,no,yes
+Vitamin (B-like),Choline,104.0881,60.1563,0.69,1,1,Added new transition,3,2,14,yes,
+Vitamin (fat soluble),Tocopherol (Vit E),430.502,164.978,14.725,1,1,,117,64,30,yes,
+Vitamin (fat soluble),Tocopherol (Vit E),430.502,121.2,14.725,1,1,,117,64,52,no,yes
+Vitamin (fat soluble),Tocotrienol,425.44,165.179,13.88,1,1,,116,10,22,yes,
+Vitamin (fat soluble),Tocotrienol,425.44,205.239,13.88,1,1,,116,10,14,no,yes
+Vitamin (fat soluble),Vitamin D2,397.415,91.152,13.75,1,1,,111,2,50,no,
+Vitamin (fat soluble),Vitamin D2,397.415,105.138,13.75,1,1,,111,2,36,no,yes
+Vitamin (fat soluble),Vitamin D2,397.415,379.44,13.75,1,1,,111,2,14,yes,
+Vitamin antioxidant,Vitamin C,175.024,71.008,0.79,-1,-1,newer std in Cyano Mix#4,138,28,14,no,yes
+Vitamin antioxidant,Vitamin C,175.024,87.06,0.79,-1,-1,newer std in Cyano Mix#4,138,28,18,no,
+Vitamin antioxidant,Vitamin C,175.024,115.009,0.79,-1,-1,newer std in Cyano Mix#4,138,28,12,yes,
+Vitamin B12,Coenzyme B12,790.723,147.144,5.4,1,1,,131,26,54,yes,
+Vitamin B12,Coenzyme B12,790.723,665.616,5.4,1,1,,131,26,20,no,yes
+Vitamin B12,Cyano B12,678.587,147.153,5.02,1,1,,126,22,36,yes,
+Vitamin B12,Cyano B12,678.587,359.1887,5.02,1,1,,126,22,22,no,yes
+Vitamin B12,Hydroxo B12,664.7,147.145,4.35,1,1,,122,42,34,yes,
+Vitamin B12,Hydroxo B12,664.7,359.2,4.35,1,1,,122,42,35,no,yes
+Vitamin B12,Methyl B12,673.087,147.148,6.29,1,1,,124,46,38,yes,
+Vitamin B12,Methyl B12,673.087,665.5684,6.29,1,1,,124,46,16,no,yes
+Vitamin rhodopsin,Retinoic Acid,301.296,105.149,11.97,1,1,,91,40,34,no,yes
+Vitamin rhodopsin,Retinoic Acid,301.296,123.169,11.97,1,1,,91,40,16,yes,
+Vitamin rhodopsin,trans Retinal,285.296,119.134,12.52,1,1,,86,8,22,no,yes
+Vitamin rhodopsin,trans Retinal,285.296,175.203,12.52,1,1,,86,8,12,yes,
+Vitamin synthesis,Dimethyl-benzimidazole,147.149,120.173,3.38,1,1,,16,2,20,no,yes
+Vitamin synthesis,Dimethyl-benzimidazole,147.149,131.832,3.38,1,1,,16,2,22,yes,
+New,Methylthioadenosine,298.1319,119.0651,2.26,1,1,Added to method on 3/30/2017,,20,44,no,yes
+New,Methylthioadenosine,298.1319,136.0271,2.26,1,1,Added to method on 3/30/2017,,20,16,yes,
+New,Cys-Gly,179.1357,76.0725,0.74,1,1,Added to method on 3/30/2017,,16,16,yes,
+New,Cys-Gly,179.1357,116.0782,0.74,1,1,Added to method on 3/30/2017,,16,14,no,yes
+New2,Homoserine Lactone,102.0143,74.106,0.72,1,1,Added to method on 1/25/2018,,26,10,yes,
+New2,Homoserine Lactone,102.0143,84.1909,0.72,1,1,Added to method on 1/25/2019,,26,8,no,yes
+New2,Indoleacrylic Acid,188.0781,115.0729,6.93,1,1,Added to method on 1/25/2020,,26,26,no,yes
+New2,Indoleacrylic Acid,188.0781,170.1004,6.93,1,1,Added to method on 1/25/2021,,26,12,yes,
+New2,Agmatine,131.1519,60.1134,0.66,1,1,Added to method on 1/25/2022,,2,10,no,yes
+New2,Agmatine,131.1519,72.0884,0.66,1,1,Added to method on 1/25/2023,,2,12,yes,
+New2,Decarboxylated S-Adenosylmethionine,355.1319,136.0639,0.89,1,1,Added to method on 1/25/2024,,24,20,no,yes
+New2,Decarboxylated S-Adenosylmethionine,355.1319,250.1236,0.89,1,1,Added to method on 1/25/2025,,24,14,yes,
+New2,Farnesyl cysteine methyl ester,340.1957,81.1128,10.59,1,1,Added to method on 1/25/2026,,30,22,yes,
+New2,Farnesyl cysteine methyl ester,340.1957,136.0058,10.59,1,1,Added to method on 1/25/2027,,30,10,no,yes
+New2,Glutathione Disulfide,613.1981,231.019,0.92,1,1,Added to method on 1/25/2028,,58,32,no,yes
+New2,Glutathione Disulfide,613.1981,355.0715,0.92,1,1,Added to method on 1/25/2029,,58,20,yes,
+New2,Riboflavin Monophosphate,455.2043,97.0422,3.36,-1,-1,Added to method on 1/25/2030,,10,26,yes,
+New2,Riboflavin Monophosphate,455.2043,213.1207,3.36,-1,-1,Added to method on 1/25/2031,,10,20,no,yes
+New2,Butyryl-L-carnitine,232.1681,85.0852,1.41,1,1,Added to method on 1/25/2032,,76,12,yes,
+New2,Butyryl-L-carnitine,232.1681,173.0939,1.41,1,1,Added to method on 1/25/2033,,76,12,no,yes
+New2,Isobutyryl-L-carnitine,232.1681,85.0852,1.37,1,1,Added to method on 1/25/2034,,76,12,yes,
+New2,Isobutyryl-L-carnitine,232.1681,173.0939,1.37,1,1,Added to method on 1/25/2035,,76,14,no,yes
+New2,Propionyl-L-carnitine,218.1343,85.023,1.03,1,1,Added to method on 1/25/2036,,72,12,yes,
+New2,Propionyl-L-carnitine,218.1343,159.1153,1.03,1,1,Added to method on 1/25/2037,,72,10,no,yes

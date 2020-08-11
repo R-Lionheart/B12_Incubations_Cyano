@@ -1,24 +1,12 @@
 # Quality control script
-source("B12_Inc_Functions.R")
 
-area.min   <- 5000 # QE suggestion: HILIC - 1000, Cyano - 5000
-RT.flex    <- 0.2 # QE suggestion: +/- 0.4 min for HILIC, +/- 0.2 min for Cyano
-blk.thresh <- 0.2 # QE suggestion: +/- 0.2
-SN.min     <- 5 # QE suggestion: 5 for Cyano, 4 for HILIC
-ppm.flex   <- 7 # QE suggestion: 7
-
-pattern = "combined"
-
-
-# Import QC'd files and clean parameter data.
-filename <- RemoveCsv(list.files(path = 'data_processed/', pattern = pattern))
-filepath <- file.path('data_processed', paste(filename, ".csv", sep = ""))
+# Import files  ----------------------------
+filename <- RemoveCsv(list.files(path = 'data_intermediate/', pattern = file.pattern))
+filepath <- file.path('data_intermediate', paste(filename, ".csv", sep = ""))
 
 combined <- assign(make.names(filename), read.csv(filepath, stringsAsFactors = FALSE, header = TRUE)) %>%
-  select(Replicate.Name:Alignment.ID, Metabolite.name) %>%
-  mutate(Run.Type = (tolower(str_extract(Replicate.Name, "(?<=_)[^_]+(?=_)")))) %>%
-  rename(Metabolite.Name = Metabolite.name)
-
+  select(Replicate.Name:Alignment.ID, Metabolite.Name) %>%
+  mutate(Run.Type = (tolower(str_extract(Replicate.Name, "(?<=_)[^_]+(?=_)")))) 
 
 msdial.runtypes <- IdentifyRunTypes(combined)
 
@@ -44,6 +32,7 @@ blank.table <- combined %>%
   select(-Blk.Area) %>%
   unique()
 
+
 # Create signal to noise (SN) and area minimum flags --------------------------------
 SN.Area.Flags <- combined %>%
   arrange(Metabolite.Name) %>%
@@ -62,6 +51,7 @@ add.blk.Flag <- add.RT.Flag %>%
   mutate(Blank.Flag = ifelse((Area.Value / Blk.max) < blk.thresh, "Blank.Flag", NA)) %>%
   select(-c("Blk.min", "Blk.max"))
 
+
 # Combine all the flags ---------------------------------------------------
 final.table <- add.blk.Flag %>%
   mutate(all.Flags      = paste(SN.Flag, Area.Min.Flag, RT.Flag, Blank.Flag, sep = ", ")) %>%
@@ -71,16 +61,9 @@ final.table <- add.blk.Flag %>%
   select(Replicate.Name:Area.Value, Area.with.QC, everything())
 
 
-test <- final.table %>% filter(!Metabolite.Name == "Betaine")
-ggplot(test, aes(x = reorder(Metabolite.Name, -Area.Value), 
-                        y = Area.Value)) +
-  geom_bar(stat = "identity") +
-  theme(axis.text.x = element_text(angle = 90)) +
-  ggtitle("Pre-QC Cyano Compounds")
-
 # Print to file with comments and a new name ------------------------------
 Description <- c(as.character(anydate(Sys.Date())),
-                 "Hello! Welcome to the world of MSDIAL QE Quality Control! ",
+                "Hello! Welcome to the world of MSDIAL QE Quality Control! ",
                  "Minimum area for a real peak: ",
                  "RT flexibility: ",
                  "Blank can be this fraction of a sample: ",
@@ -90,9 +73,4 @@ Value <- as.character(c(NA, NA, area.min, RT.flex, blk.thresh, SN.min))
 df <- data.frame(Description, Value)
 final.table <- bind_rows(df, final.table)
 
-currentDate <- Sys.Date()
-csvFileName <- paste("data_processed/QC_Cyano_Output_", currentDate, ".csv", sep = "")
-
-write.csv(final.table, csvFileName, row.names = FALSE)
-
-rm(list = ls()[!ls() %in% c("final.table", lsf.str())])
+rm(list = setdiff(ls()[!ls() %in% c("software.pattern", "file.pattern", "final.table", "RT.table", "blank.table")], lsf.str()))

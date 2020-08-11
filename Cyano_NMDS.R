@@ -68,10 +68,12 @@ Cyano_fixed <- Cyano_all %>%
                                  "171030_Smp_IT05um_2" = "171030_Smp_IL2IT05um_2",
                                  "171030_Smp_IT05um_3" = "171030_Smp_IL2IT05um_3"))
 
-# All Cyano plotted, no filtering
-all.cyano <- ggplot(Cyano_fixed, aes(x = reorder(Mass.Feature, -Adjusted.Area), y = Adjusted.Area)) +
+#Then turn it back into a factor with the levels in the correct order
+Cyano_fixed$Mass.Feature <- factor(Cyano_fixed$Mass.Feature, levels=unique(Cyano_fixed$Mass.Feature))
+all.cyano <- ggplot(Cyano_fixed, aes(x = Mass.Feature, y = Adjusted.Area)) +
   geom_bar(stat = "identity") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+  ggtitle("B12 Incubations: Raw Cyano Area")
 print(all.cyano)
 
 Cyano_filtered <- Cyano_fixed %>%
