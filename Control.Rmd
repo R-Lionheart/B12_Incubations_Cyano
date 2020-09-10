@@ -159,13 +159,14 @@ if (software.pattern == "MSDial") {
   source("src/MSDial_Rearrange.R")
   print("Data rearrange complete.")
 } else {
+  source("src/Skyline_Rearrange.R")
   csvFileName <- paste("data_intermediate/", software.pattern, "_combined_", file.pattern, "_", currentDate, ".csv", sep = "")
   write.csv(skyline.RP.Cyano, csvFileName, row.names = FALSE)
   print("This is a Skyline datafile. Exporting file to data_intermediate.")
 }
 
 # Clear environment
-rm(list = setdiff(ls()[!ls() %in% c("file.pattern", "currentDate")], lsf.str()))
+rm(list = setdiff(ls()[!ls() %in% c("file.pattern", "currentDate", "instrument.pattern", "software.pattern")], lsf.str()))
 ```
 
 --------------------------------------------------------------
@@ -188,11 +189,14 @@ Inputs:
 "data_intermediate/*software.pattern*_combined_*file.pattern*_*DATE*.csv"
 
 Outputs: 
-"data_intermediate/MSDial_RT.table_*DATE*.csv"
-"data_intermediate/MSDial_final.table_*DATE*.csv"
-"data_intermediate/MSDial_blank.table_*DATE*.csv"
-"data_processed/MSDial_QC_Output_*file.pattern*_*DATE*.csv"
+"data_intermediate/*instrument.pattern*_RT.table_*DATE*.csv"
+"data_intermediate/*instrument.pattern*_final.table_*DATE*.csv"
+"data_intermediate/*instrument.pattern*_blank.table_*DATE*.csv"
+"data_processed/*instrument.pattern*_QC_Output_*file.pattern*_*DATE*.csv"
+Additional TQS Output:
+"data_processed/*instrument.pattern*_IR.table_*DATE*.csv"
 ***
+
 
 *User action required*
 Define parameters for quality control. These act as comparison for filtering out data.
@@ -236,7 +240,8 @@ Inspect the blank.table, final.table, and RT.table values, which currently exist
 Ensure that they look normal before proceeding to clear the environment in the next step.
 ```{r, include = TRUE}
 currentDate <- Sys.Date()
-csvFileName <- paste("data_processed/", software.pattern, "_QC_Output_", file.pattern, "_", currentDate, ".csv", sep = "")
+csvFileName <- paste("data_processed/", software.pattern, "_", instrument.pattern,
+                     "_QC_Output_", file.pattern, "_", currentDate, ".csv", sep = "")
 
 tables <- grep("table", names(.GlobalEnv), value = TRUE, ignore.case = TRUE)
 tablelist <- do.call("list", mget(tables))
@@ -301,20 +306,20 @@ Comment out appropriate variable blocks according to HILIC or Cyano data.
 ```{r Cyano HILIC assignment, include = TRUE}
 
 #MSDial
-software.pattern <- "MSDial"
+# software.pattern <- "MSDial"
 
 #Skyline
-# software.pattern <- "Skyline"
+software.pattern <- "Skyline"
 
-# # Cyano Skyline
-# Column.Type = "RP"
-# standards.pattern = "Ingalls"
-# QC.pattern = "QC_Output_CyanoAq"
-
-# Cyano MSDial
+# Cyano Skyline
 Column.Type = "RP"
 standards.pattern = "Ingalls"
-QC.pattern = "QC_Output_CYANO"
+QC.pattern = "QC_Output_CyanoAq"
+
+# Cyano MSDial
+# Column.Type = "RP"
+# standards.pattern = "Ingalls"
+# QC.pattern = "QC_Output_CYANO"
 
 # HILIC
 # Column.Type = "HILIC"
@@ -327,7 +332,7 @@ print(paste(file.pattern, "column type, software pattern, standards pattern, and
 
 Import required files.
 ```{r BMIS imports, include=TRUE}
-source("src/MSDial_BMIS_Imports.R")
+source("src/BMIS_Imports.R")
 
 print("BMIS files imported.")
 ```
@@ -336,7 +341,7 @@ If data is HILIC, identify duplicates and decide which to remove
 IdentifyDuplicates function will confirm if instrument column data exists.
 User will need to use best judgement to decide which duplicate to remove.
 ```{r Check duplicates, include=TRUE}
-source("src/MSDial_Duplicates.R")
+source("src/Check_Duplicates.R")
 currentDate = Sys.Date()
 csvFileName <- paste("data_intermediate/MSDial_HILIC.duplicates_", currentDate, ".csv", sep = "")
 
@@ -367,6 +372,11 @@ if (exists("duplicates.testing")) {
   print("Non-HILIC data: no duplicates removed.")
 }
 
+```
+
+Mini check for Metabolite.Name vs Precursor.Ion.Name.
+```{r Compound Name check, include = TRUE}
+QCd.data <- QCd.data %>% rename(Metabolite.Name = Precursor.Ion.Name)
 ```
 
 Run BMIS.

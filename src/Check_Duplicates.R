@@ -12,8 +12,8 @@ if ("Column" %in% colnames(QCd.data)) {
     select(Metabolite.Name, Column, Means, Std.Devs) %>%
     unique()
   
-
 } else {
+  
   print("Non-HILIC data: no duplicates to detect.")
 }
 

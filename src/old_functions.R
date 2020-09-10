@@ -73,7 +73,7 @@ RemoveCsv <- function(full.filepaths) {
   return(no.path)
 }
 
-ChangeClasses <- function(df) {
+ChangeClasses <- function(df, col.number) {
   # Change specified columns from factors to numeric.
   #
   # Args
@@ -81,7 +81,7 @@ ChangeClasses <- function(df) {
   #
   # Returns
   #   df: MSDial dataframe, with specified columns changed to a numeric class. 
-  for (i in c(10:ncol(df))) {
+  for (i in c(col.number:ncol(df))) {
     df[, i] <- as.numeric(as.character(df[, i]))
   }
   return(df)

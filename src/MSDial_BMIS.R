@@ -11,8 +11,7 @@ Data.NoIS <- QCd.data %>%
 Int.Stds.data <- Data.withIS %>%
   select(Replicate.Name, Metabolite.Name, Area.with.QC) %>%
   mutate(Mass.Feature = Metabolite.Name) %>%
-  select(-Metabolite.Name) #%>%
-#filter(!Mass.Feature == "Guanosine Monophosphate, 15N5")
+  select(-Metabolite.Name)
 
 # Add injection volume -----------------------------------------------------------------
 SampKey <- SampKey.all %>%
