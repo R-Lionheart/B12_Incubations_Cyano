@@ -1,4 +1,4 @@
-# Skyline TQS Quality Control
+# Skyline TQS + QE Quality Control
 
 
 # Import datafiles and accompanying master files --------------------------------------------------------------
@@ -6,18 +6,18 @@ filenames <- RemoveCsv(list.files(path = "data_intermediate", pattern = file.pat
 filepath <- file.path("data_intermediate", paste(filenames, ".csv", sep = ""))
 skyline.output <- assign(make.names(filenames), read.csv(filepath, stringsAsFactors = FALSE)) 
 
-filenames <- RemoveCsv(list.files(path = "data_extras", pattern = "master", ignore.case = TRUE))
-filepath <- file.path("data_extras", paste(filenames, ".csv", sep = ""))
-master.file <- assign(make.names(filenames), read.csv(filepath, stringsAsFactors = FALSE)) %>%
-  dplyr::rename(Second.Trace = X2nd.trace)
-
+if (instrument.pattern == "TQS") {
+  filenames <- RemoveCsv(list.files(path = "data_extras", pattern = "master", ignore.case = TRUE))
+  filepath <- file.path("data_extras", paste(filenames, ".csv", sep = ""))
+  master.file <- assign(make.names(filenames), read.csv(filepath, stringsAsFactors = FALSE)) %>%
+    dplyr::rename(Second.Trace = X2nd.trace)
+}
 
 # Sanity check for runtypes  ---------------------------------------------------------------------
 # Stop program if this run has more or fewer runtypes than the normal std, blk, poo, and smp.
 skyline.runtypes <- IdentifyRunTypes(skyline.output)
 
 # Depending on instrument.pattern, create comparison tables --------------------------------------
-
 
 if (instrument.pattern == "TQS") {
   # Check for fragments in TQS data.
@@ -116,7 +116,6 @@ area.table <- skyline.output %>%
   select(Replicate.Name, Precursor.Ion.Name, Area) %>%
   filter(str_detect(Replicate.Name, regex("Smp|Poo", ignore_case = TRUE)))
 
-
 # Signal to Noise 
 # Isolate all pooled and sample runs. Find the Signal to Noise
 # by dividing the Background of each run by its Area.
@@ -130,9 +129,9 @@ SN.table <- skyline.output %>%
 
 if (instrument.pattern == "TQS") {
   all.standards <- CheckFragments(skyline.output, runtype = "Std") 
-
+  
   all.samples <- CheckFragments(skyline.output, runtype = "Smp")
-
+  
   all.samples <- all.samples %>%
     left_join(skyline.output %>% filter(str_detect(Replicate.Name, "Smp|Poo")))
   
@@ -145,11 +144,11 @@ if (instrument.pattern == "TQS") {
     left_join(ion.ratio.table, by = "Precursor.Ion.Name") %>%
     mutate(IR.Flag = ifelse(((IR.Ratio < (IR.min - IR.flex)) | (IR.Ratio > (IR.max + IR.flex))), "IR.Flag", NA)) %>%
     select(Replicate.Name:Second.Trace, Protein.Name:Background, Height, IR.Flag)
-
+  
 } else {
   
   all.samples <- skyline.output
-
+  
 }
 
 # Retention Time Flags  ---------------------------------------
@@ -167,10 +166,13 @@ Blank.flags.added <- RT.flags.added %>%
   left_join(blank.table) %>%
   group_by(Precursor.Ion.Name) %>%
   mutate(Blank.Reference = Area / Blank.max) %>%
-  mutate(blank.Flag = ifelse(((Protein.Name != "Internal Std") & ((Area / Blank.max) < blk.thresh)), 
-                             "blank.Flag", 
-                             ifelse(((Protein.Name == "Internal Std") & ((Area / Blank.max) < blk.thresh)),
-                                    "IS.blank.Flag", NA)))
+  ########################333
+  mutate(Protein.Name = ifelse(str_detect(Replicate.Name, ","), "Internal Std", "Non IS")) %>%
+  ##############################
+mutate(blank.Flag = ifelse(((Protein.Name != "Internal Std") & ((Area / Blank.max) < blk.thresh)), 
+                           "blank.Flag", 
+                           ifelse(((Protein.Name == "Internal Std") & ((Area / Blank.max) < blk.thresh)),
+                                  "IS.blank.Flag", NA)))
 
 
 # Height Flags  ---------------------------------------
@@ -188,7 +190,6 @@ Area.flags.added <- Height.flags.added %>%
   mutate(area.min.Flag = ifelse((Area < area.min), "area.min.Flag", NA)) %>%
   mutate(Area.with.QC   = ifelse(is.na(area.min.Flag), Area, NA)) %>%
   select(Replicate.Name:Area, Area.with.QC, everything())
-
 
 # Signal to Noise Flags  ---------------------------------------
 # If the Signal to Noise ratio is less than the SN.min, add a flag.
@@ -247,17 +248,32 @@ if (instrument.pattern == "TQS") {
 # "TQSQC_<original file name>.csv
 
 # Print to file with comments and a new name ------------------------------
-Description <- c(as.character(anydate(Sys.Date())),
-                 "Hello! Welcome to the world of Skyline TQS Quality Control! ",
-                 "Maximum height for a real peak: ",
-                 "Minimum height for a real peak: ",
-                 "Maximum area for a real peak: ",
-                 "RT flexibility: ",
-                 "Blank can be this fraction of a sample: ",
-                 "S/N ratio: " ,
-                 "Ion ratio flexibility", 
-                 "Processed on: ")
-Value <- c(NA, NA, height.max, height.min, area.min, RT.flex, blk.thresh, SN.min, IR.flex, Sys.time())
+if (instrument.pattern == "TQS") {
+  Description <- c(as.character(anydate(Sys.Date())),
+                   "Hello! Welcome to the world of Skyline TQS Quality Control! ",
+                   "Maximum height for a real peak: ",
+                   "Minimum height for a real peak: ",
+                   "Maximum area for a real peak: ",
+                   "RT flexibility: ",
+                   "Blank can be this fraction of a sample: ",
+                   "S/N ratio: " ,
+                   "Ion ratio flexibility", 
+                   "Processed on: ")
+  
+  Value <- c(NA, NA, height.max, height.min, area.min, RT.flex, blk.thresh, SN.min, IR.flex, Sys.time())
+} else{
+  Description <- c(as.character(anydate(Sys.Date())),
+                   "Hello! Welcome to the world of Skyline QE Quality Control! ",
+                   "Maximum height for a real peak: ",
+                   "Minimum height for a real peak: ",
+                   "Maximum area for a real peak: ",
+                   "RT flexibility: ",
+                   "Blank can be this fraction of a sample: ",
+                   "S/N ratio: " ,
+                   "Processed on: ")
+  Value <- c(NA, NA, height.max, height.min, area.min, RT.flex, blk.thresh, SN.min, Sys.time())
+  
+}
 
 df <- data.frame(Description, Value)
 final.table <- bind_rows(df, final.table)
@@ -266,12 +282,3 @@ final.table <- bind_rows(df, final.table)
 rm(list = setdiff(ls()[!ls() %in% c("software.pattern", "file.pattern", "instrument.pattern",
                                     "final.table", "ion.ratio.table", "RT.table", "blank.table",
                                     "height.table", "area.table", "SN.table")], lsf.str()))
-
-
-
-
-
-
-
-
-
