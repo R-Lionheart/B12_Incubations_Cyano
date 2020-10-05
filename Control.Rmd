@@ -1,5 +1,5 @@
 ---
-title: "Targeted MSDial Pipeline: QE"
+title: "MESOSCOPE Cyano Vitamins Analysis"
 author: "RLionheart"
 date: "12/26/2019"
 output:
@@ -16,6 +16,14 @@ Section I: Import and cleaning/rearranging of data.
 Section II: Quality control using user-defined parameters.
 Section III: Applying Best-Matched Internal Standard (B-MIS).
 Section IV: Quantifying peak area to umol/vial when possible.
+
+------------------------------------------------------------------------------------------------------
+*Remember to change the "title" at the top of the page to your project. Below, add a short description of your project as well as any relevant notes about the analysis*
+MESOSCOPE B12 Cyano Vitamins, combined with overall Cyano MESOSCOPE project.
+The Vitamins dataset is a QE Skyline Cyano run, while the larger MESOSCOPE Cyano sets are 
+MSDial QE. 
+
+------------------------------------------------------------------------------------------------------
 
 
 ```{r setup, include=TRUE}
@@ -45,14 +53,14 @@ if (length(dir(path = "data_processed/")) == 0) {
 ```
 
 
-If you would like to empty the data_processed/, data_intermediate, and figures/ subdirectories, run the following code.
-```{r, include = TRUE}
-toClear <- c("data_processed/", "data_intermediate", "figures/")
-f <- list.files(toClear, include.dirs = F, full.names = T, recursive = T)
-file.remove(f)
+<!-- If you would like to empty the data_processed/, data_intermediate, and figures/ subdirectories, run the following code. -->
+<!-- ```{r, include = TRUE} -->
+<!-- toClear <- c("data_processed/", "data_intermediate", "figures/") -->
+<!-- f <- list.files(toClear, include.dirs = F, full.names = T, recursive = T) -->
+<!-- file.remove(f) -->
 
-print("Subdirectories emptied.")
-```
+<!-- print("Subdirectories emptied.") -->
+<!-- ``` -->
 
 ----------------------------------------------------------------------------------------------------------------------------
 Section I: Import all MSDial or Skyline files that have been split by Area, Mass/charge (Mz), Retention Time (RT), and Signal to Noise (SN).
@@ -79,10 +87,10 @@ The matching.pattern and software.pattern variables should not be changed by the
 
 ```{r Pattern matching, include = TRUE}
 # MSDial
-# software.pattern <- "MSDial"
+software.pattern <- "MSDial"
 
 # Skyline
-software.pattern <- "Skyline"
+# software.pattern <- "Skyline"
 
 # QE
 instrument.pattern <- "QE"
@@ -93,7 +101,7 @@ instrument.pattern <- "QE"
 #######
 
 # Cyano Skyline
-file.pattern <- "Vitamins"
+file.pattern <- "B12-Incubations"
 matching.pattern <- "RP.Cyano"
 
 #Cyano MSDial
@@ -130,14 +138,13 @@ Comment or uncomment the block of variable names appropriate for your run.
 # Comment out the run not being used.
 
 # Skyline Cyano variables:
-skyline.RP.Cyano <- B12_Incubations_Vitamins_August2020
-#skyline.RP.Cyano <- Test_CyanoAq
+# skyline.RP.Cyano <- B12_Incubations_Vitamins_August2020
 
 # MSDial Cyano variables: 
-# Area.RP.Cyano <- Area_CYANO_EddyTransect
-# Mz.RP.Cyano   <- Mz_CYANO_EddyTransect
-# RT.RP.Cyano   <- RT_CYANO_EddyTransect
-# SN.RP.Cyano   <- SN_CYANO_EddyTransect
+Area.RP.Cyano <- Area_Cyano_B12.Incubations
+Mz.RP.Cyano   <- Mz_Cyano_B12.Incubations
+RT.RP.Cyano   <- RT_Cyano_B12.Incubations
+SN.RP.Cyano   <- SN_Cyano_B12.Incubations
 
 # MSDial HILIC variables: 
 # Area.positive <- Area_HILICPos_Example
@@ -206,19 +213,20 @@ The numbers will change depending on whether you are analyzing HILIC vs Cyano da
 # QE + TQS QC parameters
 
 # These QC conditions are modified to reflect the Vitamins run. Lower area and height min.
-area.min   <- 2500 # HILIC - 1000, Cyano - 5000
-RT.flex    <- 0.2 # HILIC +/- 0.4 min, Cyano +/- 0.2 min 
+# area.min   <- 1500 # HILIC - 1000, Cyano - 5000
+# RT.flex    <- 0.2 # HILIC +/- 0.4 min, Cyano +/- 0.2 min 
+# blk.thresh <- 0.2 # HILIC +/- 0.3, Cyano +/- 0.2
+# SN.min     <- 4 # HILIC - 4, Cyano - 4
+# height.max <- 1.0e8
+# height.min <- 1000
+
+# These QC conditions are for the rest of the Cyano run, and reflect ordinary QC levels. 
+area.min   <- 5000 # HILIC - 1000, Cyano - 5000
+RT.flex    <- 0.2 # HILIC +/- 0.4 min, Cyano +/- 0.2 min
 blk.thresh <- 0.2 # HILIC +/- 0.3, Cyano +/- 0.2
 SN.min     <- 4 # HILIC - 4, Cyano - 4
 height.max <- 1.0e8
 height.min <- 1000
-
-# Additional QC parameters only for Skyline TQS 
-# Comment this out when using MSDial or QE
-# area.max <- 1.0e8
-# IR.flex  <- 0.3
-# ppm.flex <- 7
-
 
 print("Parameter values assigned.")
 ```

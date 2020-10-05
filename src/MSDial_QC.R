@@ -73,4 +73,5 @@ Value <- as.character(c(NA, NA, area.min, RT.flex, blk.thresh, SN.min))
 df <- data.frame(Description, Value)
 final.table <- bind_rows(df, final.table)
 
-rm(list = setdiff(ls()[!ls() %in% c("software.pattern", "file.pattern", "final.table", "RT.table", "blank.table")], lsf.str()))
+rm(list = setdiff(ls()[!ls() %in% c("software.pattern","instrument.pattern", "file.pattern",
+                                    "final.table", "RT.table", "blank.table")], lsf.str()))

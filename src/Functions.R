@@ -4,6 +4,8 @@ ChangeClasses <- function(df, start.column, end.column) {
   #
   # Args
   #   df: MSDial dataframe containing sample columns.
+  #   start.column: 
+  #   end.column: 
   #
   # Returns
   #   df: MSDial dataframe, with specified columns changed to a numeric class. 

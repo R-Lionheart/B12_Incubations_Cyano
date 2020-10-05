@@ -19,7 +19,7 @@ for (df in seq_along(headers.set)) {
 }
 
 # Change variable classes ---------------------------------------------------------------------
-classes.changed <- lapply(names(headers.set), function(x) ChangeClasses(headers.set[[x]], 10))
+classes.changed <- lapply(names(headers.set), function(x) ChangeXClasses(headers.set[[x]]))
 names(classes.changed) <- runs
 
 list2env(classes.changed, globalenv())
