@@ -10,6 +10,8 @@ options(scipen = 999)
 options(digits = 1)
 source("src/Functions.R")
 
+replace_nonvalues <- function(x) (gsub(NaN, NA, x))
+
 ## QC threshold is lowered to 1500 for vitamins
 ## S/N flags need to be incorporated
 ## DMB should be removed from averaged group, otherwise spikes the overall. 
@@ -66,8 +68,8 @@ Incubations <- MSDial_QE_QC_Output_B12.Incubations_2020.10.05 %>%
 
 
 # Join together
-Complete.Dataset <- Incubations %>%
-  rbind(Vitamins) %>%
+Complete.Dataset <- Vitamins %>%
+  #rbind(Incubations) %>%
   mutate(SizeFraction = ifelse(str_detect(Supergroup, "5um"), "5um", "0.2um"),
          Eddy = ifelse(str_detect(Supergroup, "IL1"), "Cyclonic", "Anticyclonic"),
          Dataset = "Vitamins") %>%
@@ -76,22 +78,22 @@ Complete.Dataset <- Incubations %>%
                                ifelse(str_detect(Supergroup, "T0"), "TimeZero",
                                       ifelse(str_detect(Supergroup, "Control"), "Control",
                                              ifelse(str_detect(Supergroup, "DMBnoBT|noBT"), "Nutrients", "NoNutrients")))))
-
-  
-  
+ 
 
 # Plot Preparation --------------------------------------------------------
-Combined <- Groups.Binned %>%
-  filter(!Precursor.Ion.Name == "B2-IS",
-         !Precursor.Ion.Name == "DMB") %>%
-  group_by(Precursor.Ion.Name, Binned.Group, SizeFraction, Eddy) %>%
+Plot.Prep <- Complete.Dataset %>%
+  # filter(!Precursor.Ion.Name == "B2-IS",
+  #        !Precursor.Ion.Name == "DMB") %>%
+  group_by(Precursor.Ion.Name, Supergroup) %>%
   mutate(Area.mean = mean(Area, na.rm = TRUE),
          Area.with.QC.mean = mean(Area.with.QC, na.rm = TRUE)) %>%
   select(Supergroup, Precursor.Ion.Name, SizeFraction, Eddy, 
-         Binned.Group, Area.with.QC, Area.mean, Area.with.QC.mean)
+         Binned.Group, Area.with.QC, Area, Area.mean, Area.with.QC.mean) %>%
+  mutate_at(c("Area.with.QC.mean"), replace_nonvalues)
+  
 
 ## Which compounds exist in which size fraction? 
-Which.Cmpds <- Combined %>%
+Which.Cmpds <- Plot.Prep %>%
   mutate(
     NumberOfSamples = n(),
     Percent.Missing = (sum(is.na(Area.with.QC))/NumberOfSamples)
@@ -105,20 +107,20 @@ MakeTable <- function(df, EddyVorticity) {
       Binned.Group == "TimeZero" ~ "Time Zero. In situ condition at the start of the experiment.",
       Binned.Group == "noNutrients" ~ "No Nutrients. Consists of DMBnoB12 and noB12 samples.",
       Binned.Group == "Nutrients" ~ "Nutrients. Spikes added after collection: B12, DMB, and Control",
-    )) %>% 
-    mutate(Supergroup = factor(Supergroup, 
+    )) %>%
+    mutate(Supergroup = factor(Supergroup,
                                levels = c("IL1T0", "IL1Control", "IL1DMB", "IL1WBT", "IL1DSW", "IL1DMBnoBT", "IL1noBT",
                                           "IL1T05um", "IL1Control5um", "IL1DMB5um", "IL1WBT5um", "IL1DSW5um","IL1DMBnoBT5um", "IL1noBT5um",
                                           "IL2T0", "IL2Control", "IL2DMB", "IL2WBT", "IL2DSW", "IL2DMBnoBT", "IL2noBT",
                                           "IL2T05um", "IL2Control5um", "IL2DMB5um", "IL2WBT5um", "IL2DSW5um","IL2DMBnoBT5um", "IL2noBT5um"))) %>%
     dplyr::group_by(Eddy) %>%
-    dplyr::group_by(SizeFraction, Precursor.Ion.Name) %>% 
+    dplyr::group_by(SizeFraction, Precursor.Ion.Name) %>%
     dplyr::summarize(
       NumberOfSamples = n(),
       PercentMissing = (sum(is.na(Area.with.QC))/NumberOfSamples)
-    ) %>% 
-    gt(rowname_col = "Supergroup") %>% 
-    tab_header(title = md(paste(EddyVorticity, "Eddy")),
+    ) %>%
+    gt(rowname_col = "Supergroup") %>%
+    tab_header(title = md(paste(EddyVorticity, "Eddy, QC at 1500")),
                subtitle = "Which Compounds Exist in Which Size Fractions?") %>%
     cols_align(align = "right", columns = TRUE) %>%
     data_color(
@@ -144,7 +146,7 @@ Which.Cmpds$Binned.Group <- factor(Which.Cmpds$Binned.Group,
 
 heatmap <- ggplot(data = Which.Cmpds, aes(x = Precursor.Ion.Name, y = Binned.Group, 
                                           fill = Percent.Missing)) + 
-  facet_wrap(~SizeFraction + Eddy) +
+  facet_wrap(~SizeFraction) +
   geom_tile(stat = "identity") +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, size = 10),
         axis.text.y = element_text(size = 10),
@@ -155,9 +157,10 @@ print(heatmap)
 
 
 ## Do nutrients change with additions/size fractions?
-NutrientChange <- Combined %>%
+NutrientChange <- Which.Cmpds %>%
   select(Precursor.Ion.Name, Area.with.QC.mean, Binned.Group, SizeFraction) %>%
-  unique()
+  unique() %>%
+  mutate(Area.with.QC.mean = as.numeric(Area.with.QC.mean))
 
 ggplot(NutrientChange, aes(x = reorder(Precursor.Ion.Name, -Area.with.QC.mean), y = Area.with.QC.mean,
                      fill = Binned.Group)) +
