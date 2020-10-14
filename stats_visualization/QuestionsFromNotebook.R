@@ -12,7 +12,7 @@ source("src/Functions.R")
 
 replace_nonvalues <- function(x) (gsub(NaN, NA, x))
 
-## QC threshold is lowered to 1500 for vitamins
+## QC threshold is lowered to 1500 for vitamins, compared with ordinary 5000 level
 ## S/N flags need to be incorporated
 ## DMB should be removed from averaged group, otherwise spikes the overall. 
 
@@ -32,30 +32,33 @@ replace_nonvalues <- function(x) (gsub(NaN, NA, x))
 # CONTROL: [Control], 100% in situ water from 25 m, incubated and then filtered.
 
 
-file.pattern <- "Vitamins|MSDial"
-
 replace_nonvalues <- function(x) (gsub(NaN, NA, x))
 
 # Import files --------------------------------------------------
-filenames <- RemoveCsv(list.files(path = "data_processed/", pattern = file.pattern))
-
-for (i in filenames) {
-  filepath <- file.path("data_processed/", paste(i,".csv", sep = ""))
-  assign(make.names(i), read.csv(filepath, stringsAsFactors = FALSE, check.names = TRUE))
-}
-
-# Munge vitamins file
-Vitamins <- Skyline_QE_QC_Output_Vitamins_2020.10.05 %>%
+# Munge vitamin files
+Vitamins_5000QC <- read.csv("data_processed/Skyline_QE_QC_Output_Vitamins_5000QC.csv", stringsAsFactors = FALSE) %>%
   slice(-1:-9) %>%
   select(-c(Description, Value)) %>%
   filter(!str_detect(Replicate.Name, 
                      "Blk|Std|TruePoo|CultureMED4|Sept29QC|TruePooWeek1|TruePooWeek2|
                      TruePooWeek3|TruePooWeek4|DSW700m|Process")) %>%
   separate(Replicate.Name, into = c("Date", "runtype", "Supergroup", "replicate"), remove = FALSE) %>%
-  select(Supergroup, Precursor.Ion.Name, Area, Area.with.QC, all.Flags)
+  mutate(QC.Level = "5000") %>%
+  select(Supergroup, Precursor.Ion.Name, Area, Area.with.QC, all.Flags, QC.Level) 
+
+Vitamins_1500QC <- read.csv("data_processed/Skyline_QE_QC_Output_Vitamins_1500QC.csv") %>%
+  slice(-1:-9) %>%
+  select(-c(Description, Value)) %>%
+  filter(!str_detect(Replicate.Name, 
+                     "Blk|Std|TruePoo|CultureMED4|Sept29QC|TruePooWeek1|TruePooWeek2|
+                     TruePooWeek3|TruePooWeek4|DSW700m|Process")) %>%
+  separate(Replicate.Name, into = c("Date", "runtype", "Supergroup", "replicate"), remove = FALSE) %>%
+  mutate(QC.Level = "1500") %>%
+  select(Supergroup, Precursor.Ion.Name, Area, Area.with.QC, all.Flags, QC.Level)
 
 # Munge full Incubations dataset
-Incubations <- MSDial_QE_QC_Output_B12.Incubations_2020.10.05 %>%
+Incubations <- read.csv("data_processed/MSDial_QE_QC_Output_B12-Incubations_2020-10-12.csv",
+                        stringsAsFactors = FALSE) %>%
   slice(-1:-6) %>%
   select(-c(Description, Value)) %>%
   filter(!str_detect(Replicate.Name, 
@@ -64,11 +67,24 @@ Incubations <- MSDial_QE_QC_Output_B12.Incubations_2020.10.05 %>%
   separate(Replicate.Name, into = c("Date", "runtype", "Supergroup", "replicate"), remove = FALSE) %>%
   rename(Precursor.Ion.Name = Metabolite.Name,
          Area = Area.Value) %>%
-  select(Supergroup, Precursor.Ion.Name, Area, Area.with.QC, all.Flags) 
+  mutate(QC.Level = "5000") %>%
+  select(Supergroup, Precursor.Ion.Name, Area, Area.with.QC, all.Flags, QC.Level)
+
+## QC Comparisons  --------------------------------------------------
+All.Vitamins <- Vitamins_1500QC %>%
+  rbind(Vitamins_5000QC) %>%
+  # filter(!Precursor.Ion.Name == "B2-IS",
+  #        !Precursor.Ion.Name == "DMB") %>%
+  group_by(Precursor.Ion.Name, Supergroup) %>%
+  mutate(Area.mean = mean(Area, na.rm = TRUE),
+         Area.with.QC.mean = mean(Area.with.QC, na.rm = TRUE)) %>%
+  select(Supergroup, Precursor.Ion.Name, SizeFraction, Eddy, 
+         Binned.Group, Area.with.QC, Area, Area.mean, Area.with.QC.mean) %>%
+  mutate_at(c("Area.with.QC.mean"), replace_nonvalues)
 
 
 # Join together
-Complete.Dataset <- Vitamins %>%
+Complete.Dataset <- Vitamins_1500QC%>%
   #rbind(Incubations) %>%
   mutate(SizeFraction = ifelse(str_detect(Supergroup, "5um"), "5um", "0.2um"),
          Eddy = ifelse(str_detect(Supergroup, "IL1"), "Cyclonic", "Anticyclonic"),
