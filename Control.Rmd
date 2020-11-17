@@ -58,7 +58,7 @@ If you would like to empty the data_processed/, data_intermediate, and figures/ 
 # toClear <- c("data_processed/", "data_intermediate", "figures/")
 # f <- list.files(toClear, include.dirs = F, full.names = T, recursive = T)
 # file.remove(f)
-# 
+#  
 # print("Subdirectories emptied.")
 # ```
 
@@ -213,20 +213,20 @@ The numbers will change depending on whether you are analyzing HILIC vs Cyano da
 # QE + TQS QC parameters
 
 # These QC conditions are modified to reflect the Vitamins run. Lower area and height min.
+# area.min   <- 1500 # HILIC - 1000, Cyano - 5000
+# RT.flex    <- 0.2 # HILIC +/- 0.4 min, Cyano +/- 0.2 min
+# blk.thresh <- 0.2 # HILIC +/- 0.3, Cyano +/- 0.2
+# SN.min     <- 4 # HILIC - 4, Cyano - 4
+# height.max <- 1.0e8
+# height.min <- 1000
+
+# These QC conditions are for the rest of the Cyano run, and reflect ordinary QC levels. 
 area.min   <- 5000 # HILIC - 1000, Cyano - 5000
 RT.flex    <- 0.2 # HILIC +/- 0.4 min, Cyano +/- 0.2 min
 blk.thresh <- 0.2 # HILIC +/- 0.3, Cyano +/- 0.2
 SN.min     <- 4 # HILIC - 4, Cyano - 4
 height.max <- 1.0e8
 height.min <- 1000
-
-# These QC conditions are for the rest of the Cyano run, and reflect ordinary QC levels. 
-# area.min   <- 5000 # HILIC - 1000, Cyano - 5000
-# RT.flex    <- 0.2 # HILIC +/- 0.4 min, Cyano +/- 0.2 min
-# blk.thresh <- 0.2 # HILIC +/- 0.3, Cyano +/- 0.2
-# SN.min     <- 4 # HILIC - 4, Cyano - 4
-# height.max <- 1.0e8
-# height.min <- 1000
 
 print("Parameter values assigned.")
 ```
@@ -245,7 +245,7 @@ Ensure that they look normal before proceeding to clear the environment in the n
 ```{r, include = TRUE}
 currentDate <- Sys.Date()
 csvFileName <- paste("data_processed/", software.pattern, "_", instrument.pattern,
-                     "_QC_Output_", file.pattern, "_", currentDate, ".csv", sep = "")
+                     "_QC_Output_", file.pattern, ".csv", sep = "")
 
 tables <- grep("table", names(.GlobalEnv), value = TRUE, ignore.case = TRUE)
 tablelist <- do.call("list", mget(tables))
@@ -274,8 +274,8 @@ rm(list = setdiff(ls()[!ls() %in% c("file.pattern")], lsf.str()))
 <!-- Identify internal standards and visualize those areas. -->
 <!-- Test if replicate names are identical across the data and the sample key. Stop the analysis process if not. -->
 <!-- Identify/visualize internal standards. Look over it to ensure that things are looking more or less "normal". -->
-<!-- Using pooled and sample runs, calculate internal standard averages.  -->
-<!-- Create an adjusted area for all pooled and sample runs by comparing each mass feature to each internal standard.  -->
+<!-- Using pooled and sample runs, calculate internal standard averages. -->
+<!-- Create an adjusted area for all pooled and sample runs by comparing each mass feature to each internal standard. -->
 <!-- Calculate RSD for each mass feature/internal standard pair, and use this to choose a matched internal standard. -->
 <!-- Decide whether to accept a B-MIS or not, according to user-defined values. -->
 
@@ -299,21 +299,21 @@ rm(list = setdiff(ls()[!ls() %in% c("file.pattern")], lsf.str()))
 <!-- cut.off2 = Relative squared deviation minimum. -->
 
 <!-- ```{r BMIS cutoff values, include = TRUE} -->
-<!-- cut.off <- 0.4  -->
-<!-- cut.off2 <- 0.1  -->
+<!-- cut.off <- 0.4 -->
+<!-- cut.off2 <- 0.1 -->
 
 <!-- print("B-MIS Cutoff values assigned.") -->
 <!-- ``` -->
 
 <!-- *User action required* -->
-<!-- Comment out appropriate variable blocks according to HILIC or Cyano data. -->
+<!-- Comment out appropriate variable blocks according to HILIC or Cyano data. Do not replace any of the variables. -->
 <!-- ```{r Cyano HILIC assignment, include = TRUE} -->
 
 <!-- #MSDial -->
-<!-- # software.pattern <- "MSDial" -->
+<!-- software.pattern <- "MSDial" -->
 
 <!-- #Skyline -->
-<!-- software.pattern <- "Skyline" -->
+<!-- # software.pattern <- "Skyline" -->
 
 <!-- # Cyano Skyline -->
 <!-- Column.Type = "RP" -->
@@ -341,7 +341,7 @@ rm(list = setdiff(ls()[!ls() %in% c("file.pattern")], lsf.str()))
 <!-- print("BMIS files imported.") -->
 <!-- ``` -->
 
-<!-- If data is HILIC, identify duplicates and decide which to remove  -->
+<!-- If data is HILIC, identify duplicates and decide which to remove -->
 <!-- IdentifyDuplicates function will confirm if instrument column data exists. -->
 <!-- User will need to use best judgement to decide which duplicate to remove. -->
 <!-- ```{r Check duplicates, include=TRUE} -->
@@ -360,7 +360,7 @@ rm(list = setdiff(ls()[!ls() %in% c("file.pattern")], lsf.str()))
 <!-- ``` -->
 
 <!-- *User action required* -->
-<!-- The below section automatically removes the HILICNeg compounds from the QC'd data.  -->
+<!-- The below section automatically removes the HILICNeg compounds from the QC'd data. -->
 <!-- This is not necessarily the correct solution: the user must look at the data to ensure that they are removing the right compounds. -->
 <!-- ```{r Remove duplicates, include = TRUE} -->
 <!-- if (exists("duplicates.testing")) { -->

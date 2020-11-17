@@ -1,13 +1,13 @@
-source("B12_Inc_Functions.R")
-# source("src/biostats.R")
+source("src/Functions.R")
+#source("src/biostats.R")
 options(scipen = 999)
 
 library(tidyverse) 
 library(vegan)
 
 # User data
-pattern = "BMIS"
-percentMissing = 0.5
+pattern = "CompleteDatasetAvg"
+#percentMissing = 0.5
 
 # Functions
 makeWide <- function(df) {
@@ -43,13 +43,12 @@ RemoveCsv <- function(full.filepaths) {
 
 
 # Data import and first filtering of unnecessary SampIDs --------------------------------------------
-filename <- RemoveCsv(list.files(path = 'data_processed/', pattern = pattern))
-filepath <- file.path('data_processed', paste(filename, ".csv", sep = ""))
+filename <- RemoveCsv(list.files(path = "data_intermediate//", pattern = pattern))
+filepath <- file.path("data_intermediate/", paste(filename, ".csv", sep = ""))
 
 Cyano_all <- assign(make.names(filename), read.csv(filepath, stringsAsFactors = FALSE)) %>%
   select(Mass.Feature, runDate:replicate, Adjusted.Area) %>%
   unite(Replicate.Name, runDate:replicate, sep = "_") %>%
-  filter(!str_detect(Replicate.Name, "Sept29QC|TruePoo|TruePooWeek2|TruePooWeek3|TruePooWeek4|DSW700m")) %>%
   filter(!Mass.Feature == "Inj_vol") %>%
   filter(!str_detect(Mass.Feature, ","))
 

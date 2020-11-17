@@ -1,0 +1,90 @@
+---
+title: "Summary Oct26"
+author: "RLionheart"
+date: "10/26/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### This is a summary of the ongoing analysis of the MESOSCOPE 
+MESOSCOPE B12 Cyano Vitamins, combined with overall Cyano MESOSCOPE project.
+The Vitamins dataset is a QE Skyline Cyano run, while the larger MESOSCOPE Cyano sets are 
+MSDial QE. 
+
+---
+
+#### QE + TQS QC parameters
+
+The below QC conditions are modified to reflect the Vitamins run. Lower area and height min.
+
+* **area.min   <- 1500 # HILIC - 1000, Cyano - 5000**
+* RT.flex    <- 0.2 # HILIC +/- 0.4 min, Cyano +/- 0.2 min
+* blk.thresh <- 0.2 # HILIC +/- 0.3, Cyano +/- 0.2
+* SN.min     <- 4 # HILIC - 4, Cyano - 4
+* height.max <- 1.0e8
+* height.min <- 1000
+
+These QC conditions are for the rest of the Cyano run, and reflect ordinary QC levels. 
+
+* **area.min   <- 5000 # HILIC - 1000, Cyano - 5000**
+* RT.flex    <- 0.2 # HILIC +/- 0.4 min, Cyano +/- 0.2 min
+* blk.thresh <- 0.2 # HILIC +/- 0.3, Cyano +/- 0.2
+* SN.min     <- 4 # HILIC - 4, Cyano - 4
+* height.max <- 1.0e8
+* height.min <- 1000
+
+---
+
+#### Comparing QC levels in the Vitamins run: 
+
+![5000 minimum area vs 1500 minimum area cutoff.](figures/QC_Comparison.png)
+
+---
+
+#### Combine all relevant datasets (Vitamins 5000, Full Cyano B12 Incubations set)
+
+```{r sample table, echo=FALSE}
+CompleteDataset <- read.csv("data_intermediate/Vitamins_Incubations_CompleteDataset.csv")
+kable(CompleteDataset[1:10, ], caption = "Sample of Combined Dataset")
+```
+
+#### Calculate triplicate averages. 
+Remove DMB and B2-IS from the averages calculations in the Vitamins set (to avoid inflated values from added DMB)
+```{r average table, echo=FALSE}
+CompleteDatasetAvg <- read.csv("data_intermediate/Vitamins_Incubations_CompleteDatasetAvg.csv")
+kable(CompleteDatasetAvg[1:15, ], caption = "Sample of Averaged Dataset")
+```
+
+---
+
+## Which compounds exist in which size fraction?
+How many of the samples show up in each size fraction? What is the quality distribution of what exists where?
+![Distribution of Compounds.](figures/Which.Compounds.Present.png)
+
+See which compounds have 100% of the samples present, versus those that have no samples present.
+Remember that this is after QC, but before averaging and DMB/B2-IS removal.
+
+```{r Which Compounds table, echo=FALSE}
+WhichCompoundsTable <- read.csv("data_intermediate/WhichCompoundsTable.csv")
+kable(WhichCompoundsTable, caption = "Compounds with 100% and 0% of Samples Present")
+```
+
+## Do Nutrients Change with Treatments and Size Fractions?
+![Are Nutrients Changing?.](figures/DoNutrientsChange.png)
+
+## Do Compound Proportions Remain Constant with DeepSeaWater?
+
+I am finding it challenging to visualize this with the amount of compounds we are working with. Can we slim down the amount? Arrange the proportions numerically rather than alphabetically? This image is impossible to get anything from, so I filtered for only two abundant compounds (Betaine and Choline) to demonstrate what some proportions may look like.
+![All Compounds.](figures/DoCompoundProportionsChange.png)
+![Only Betaine and Choline.](figures/DoCompoundProportionsChange_BetaineCholine.png)
+---
+
+## How much of all the compound is in each size fraction?
+![Anticyclonic.](figures/HowMuchinSizeFractions.png)
+
+
+

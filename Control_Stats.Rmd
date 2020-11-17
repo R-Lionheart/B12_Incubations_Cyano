@@ -1,0 +1,101 @@
+---
+title: "Control_Stats"
+author: "RLionheart"
+date: "11/05/2020"
+output: html_document
+---
+
+## QUESTIONS ##
+Both the Vitamins and Incubation datasets are grouped together in the bins, but they went in with different QCs.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(vegan)
+options(scipen = 999)
+source("src/Functions.R")
+
+#source("src/biostats.R")
+# library(RCurl)
+# library(rlist)
+
+replace_nonvalues <- function(x) (gsub(NaN, NA, x))
+```
+
+This Control.Rmd script outlines the order in which the MESOSCOPE B12 Incubation code snippets are to be run. 
+
+Unless otherwise stated, all inputs come from the data_raw or data_extras directories, and all outputs proceed to data_processed or figures.
+-----
+
+## OPTIONAL CHUNK ##
+If you are starting from scratch, it's a good idea to clean out the "data_processed/" and "figures/" folders so you can be sure your code is producing everything it needs for iterative analysis.
+
+# ```{r Optional clean slate chunk, include=TRUE}
+# if(!dir.exists("data_processed"))dir.create("data_processed")
+# if(!dir.exists("figures"))dir.create("data_processed")
+# 
+# if (length(dir(path = "data_processed/")) == 0) {
+#   cat("\nData_processed subdirectory is empty.")
+# } else {
+#   cat("Data_processed subdirectory is not empty.\n")
+# }
+# 
+# if (length(dir(path = "figures/")) == 0) {
+#   cat("\nFigures subdirectory is empty.")
+# } else {
+#   cat("Figures subdirectory is not empty.\n")
+# }
+# 
+# ```
+
+
+The below chunk imports the QC'd files of the raw peak areas, both the MSDial and the Skyline for the Vitamins and Full Incubation sets of the project. They are then combined to one dataset for analysis.
+
+<!-- *Import_files.R* -->
+<!-- Inputs: All .csv files in the data_raw directory. This includes all Area/Mz/RT/SN files, positive and negative, from MSDial. Also includes additional supporting data (Chlorophyll information). -->
+<!-- Outputs: One combined file titled MSDial_combined_TodaysDate.csv -->
+
+```{r}
+source("src/Combine_Vitamins_Incubations.R")
+```
+
+
+<!-- *Split_by_EddyFilter.R* -->
+<!-- Inputs: BMIS file from BMIS processing step. -->
+<!-- Outputs:  -->
+<!-- - BMISd file with the original T0 naming issues fixed, titled BMISd_Time0_Fixed_TodaysDate.csv -->
+<!-- - Four files titled IsoLagranN_FilterSize_notstd.csv. Each file is the BMISd data, split by eddy and filter. -->
+
+Next is to complete the preliminary stats processing; create datasets split by eddy orientation and filter size, and run all data through an NMDS script to create a distance matrix. 
+
+*NMDS_figs.R*
+Inputs:
+- All four non-standardized, non-ChlA csvs split by eddy and size fraction.
+- Nonstandardized, ChlA-normalized csvs split by eddy (IL1_5um, IL2_5um).
+Outputs:
+- Six files from inputs, all shifted to wide format and standardized.
+- Six images of all NMDS figures from the output files.
+
+```{r Preliminary processing, include=TRUE}
+#source("stats_visualization/Split_by_EddyFilter.R")
+source("stats_visualization/NMDS_figs.R")
+```
+
+After the above chunks have been run, the below scripts should be possible to run in any order, depending on your analysis interest.
+
+The below files are not perfect and still need work, but feel free to explore any of the analytical pathways!
+
+```{r Followup scripts}
+source("stats_visualization/ANOSIM_IndicSpecies.R")
+source("stats_visualization/ANOVA_all.R") #(mostly useless. needs work.)
+source("stats_visualization/ANOVA_B12.R")
+source("stats_visualization/ANOVA_DSW.R")
+source("stats_visualization/FourCompound_Ratios.R")
+source("stats_visualization/Heatmaps.R")
+source("stats_visualization/Heatmps_with_Clustering.R")
+source("stats_visualization/kmeans_PAM.R")
+source("stats_visualization/Ratios.R")
+source("stats_visualization/Raw_Plots.R")
+source("stats_visualization/Univariate_Stats.R")
+```
