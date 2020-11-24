@@ -57,7 +57,7 @@ The below chunk imports the QC'd files of the raw peak areas, both the MSDial an
 <!-- Outputs: One combined file titled MSDial_combined_TodaysDate.csv -->
 
 ```{r}
-source("src/Combine_Vitamins_Incubations.R")
+source("stats_visualization/Combine_Vitamins_Incubations.R")
 ```
 
 
