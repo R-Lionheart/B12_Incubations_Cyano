@@ -1,7 +1,7 @@
 library(tidyverse)
 options(scipen = 999)
 
-source("src/B12_Functions.R")
+source("src/Functions.R")
 
 dataset.pattern <- "IsoLagran|wide"
 BMIS.pattern <- "Time0"
@@ -29,26 +29,6 @@ rm(list=ls(pattern="long|wide"))
 
 
 # Complete BMISd not normd
-# BMISd.notnormd <- read.csv("data_processed/BMIS_Output_2020-03-26.csv", stringsAsFactors = FALSE) %>%
-#   select(Mass.Feature, Adjusted.Area, Run.Cmpd) %>%
-#   filter(!str_detect(Run.Cmpd, "Sept29QC|TruePooWeek1|TruePooWeek2|TruePooWeek3|TruePooWeek4|DSW700m")) %>%
-#   separate(Run.Cmpd, sep = " ", into = c("Replicate.Name"), remove = TRUE) %>%
-#   mutate(Replicate.Name = recode(Replicate.Name, 
-#                                  "171002_Smp_IT0_1" ="171002_Smp_IL1IT0_1", 
-#                                  "171002_Smp_IT0_2" = "171002_Smp_IL1IT0_2",
-#                                  "171002_Smp_IT0_3" = "171002_Smp_IL1IT0_3",
-#                                  "171009_Smp_IT05um_1" = "171009_Smp_IL1IT05um_1",
-#                                  "171009_Smp_IT05um_2" = "171009_Smp_IL1IT05um_2",
-#                                  "171009_Smp_IT05um_3" = "171009_Smp_IL1IT05um_3",
-#                                  "171016_Smp_IT0_1" = "171016_Smp_IL2IT0_1",
-#                                  "171016_Smp_IT0_2" = "171016_Smp_IL2IT0_2",
-#                                  "171016_Smp_IT0_3" = "171016_Smp_IL2IT0_3",
-#                                  "171023_Smp_IT05um_1" = "171023_Smp_IL2IT05um_1",
-#                                  "171023_Smp_IT05um_2" = "171023_Smp_IL2IT05um_2",
-#                                  "171023_Smp_IT05um_3" = "171023_Smp_IL2IT05um_3")) %>%
-#   separate(Replicate.Name, into = c("one", "two", "SampID", "four"), fill = "right", remove = FALSE) %>%
-#   select(Mass.Feature, Replicate.Name, SampID, Adjusted.Area) %>%
-#   drop_na()
 
 filenames <- RemoveCsv(list.files(path = "data_processed/", pattern = BMIS.pattern))
 filepath <- file.path("data_processed", paste(filenames, ".csv", sep = ""))
