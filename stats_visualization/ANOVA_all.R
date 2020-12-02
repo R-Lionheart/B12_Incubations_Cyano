@@ -3,8 +3,8 @@ options(scipen = 999)
 
 source("src/Functions.R")
 
-dataset.pattern <- "IsoLagran|wide"
-BMIS.pattern <- "Time0"
+dataset.pattern <- "_AvgCompleteDataset"
+#BMIS.pattern <- "Time0"
 
 ## Import your datasets. This will import a lot of information.
 filenames <- RemoveCsv(list.files(path = "data_processed/", pattern = dataset.pattern))
@@ -15,49 +15,48 @@ for (i in filenames) {
 }
 
 
-BMISd_1_0.2_long <- MakeLong(IsoLagran1_Cyclonic_0.2um_wide_std)
-BMISd_1_5_long <- MakeLong(IsoLagran1_Cyclonic_5um_wide_std)
-BMISd_2_0.2_long <- MakeLong(IsoLagran2_Anticyclonic_0.2um_wide_std)
-BMISd_2_5_long <- MakeLong(IsoLagran2_Anticyclonic_5um_wide_std)
+# BMISd_1_0.2_long <- MakeLong(IsoLagran1_Cyclonic_0.2um_wide_std)
+# BMISd_1_5_long <- MakeLong(IsoLagran1_Cyclonic_5um_wide_std)
+# BMISd_2_0.2_long <- MakeLong(IsoLagran2_Anticyclonic_0.2um_wide_std)
+# BMISd_2_5_long <- MakeLong(IsoLagran2_Anticyclonic_5um_wide_std)
 
-BMISD.normd <- BMISd_1_0.2_long %>%
-  rbind(BMISd_1_5_long) %>%
-  rbind(BMISd_2_0.2_long) %>%
-  rbind(BMISd_2_5_long)
+# BMISD.normd <- BMISd_1_0.2_long %>%
+#   rbind(BMISd_1_5_long) %>%
+#   rbind(BMISd_2_0.2_long) %>%
+#   rbind(BMISd_2_5_long)
 
-rm(list=ls(pattern="long|wide"))
+# rm(list=ls(pattern="long|wide"))
 
 
 # Complete BMISd not normd
 
-filenames <- RemoveCsv(list.files(path = "data_processed/", pattern = BMIS.pattern))
-filepath <- file.path("data_processed", paste(filenames, ".csv", sep = ""))
-for (i in filenames) {
-  filepath <- file.path("data_processed/", paste(i, ".csv", sep = ""))
-  assign(make.names(i), read.csv(filepath, stringsAsFactors = FALSE, check.names = FALSE))
-}
+# filenames <- RemoveCsv(list.files(path = "data_processed/", pattern = BMIS.pattern))
+# filepath <- file.path("data_processed", paste(filenames, ".csv", sep = ""))
+# for (i in filenames) {
+#   filepath <- file.path("data_processed/", paste(i, ".csv", sep = ""))
+#   assign(make.names(i), read.csv(filepath, stringsAsFactors = FALSE, check.names = FALSE))
+# }
 
-BMISd <- BMISd_Time0_Fixed_2020.07.15
-grouped.BMISd <- BMISd %>%
-  left_join(BMISD.normd) %>%
-  separate(Replicate.Name, into = c("date", "runtype", "SampID", "replicate")) %>%
-  group_by(Mass.Feature, SampID) %>%
-  mutate(Avg.Area = mean(Adjusted.Area)) %>%
-  mutate(Count = n()) %>%
-  filter(!Count < 3) %>%
-  ungroup() %>%
-  mutate(SampID = factor(SampID, ordered = TRUE)) 
+# BMISd <- BMISd_Time0_Fixed_2020.07.15
+# grouped.BMISd <- BMISd %>%
+#   left_join(BMISD.normd) %>%
+#   separate(Replicate.Name, into = c("date", "runtype", "SampID", "replicate")) %>%
+#   group_by(Mass.Feature, SampID) %>%
+#   mutate(Avg.Area = mean(Adjusted.Area)) %>%
+#   mutate(Count = n()) %>%
+#   filter(!Count < 3) %>%
+#   ungroup() %>%
+#   mutate(SampID = factor(SampID, ordered = TRUE)) 
 
-glimpse(grouped.BMISd)
-levels(grouped.BMISd$SampID)
+For.Anova <- Vitamins_Incubations_AvgCompleteDataset %>%
+  dplyr::mutate(Binned.Group = factor(Binned.Group, ordered = TRUE))
 
-ggplot(grouped.BMISd, aes(x = Mass.Feature, y = Avg.Area, fill = SampID)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  theme(axis.text.x = element_blank())
+glimpse(For.Anova)
+levels(Vitamins_Incubations_AvgCompleteDataset2$Binned.Group)
 
 # Apply ANOVA to dataframe, summarize and check significance
-AnovaList <- lapply(split(grouped.BMISd, grouped.BMISd$Mass.Feature), function(i) {
-  aov(lm(Adjusted.Area ~ SampID, data = i))
+AnovaList <- lapply(split(Vitamins_Incubations_AvgCompleteDataset2, Vitamins_Incubations_AvgCompleteDataset2$Precursor.Ion.Name), function(i) {
+  aov(lm(Area.with.QC.mean ~ Binned.Group, data = i))
 })
 AnovaListSummary <- lapply(AnovaList, function(i) {
   summary(i)
