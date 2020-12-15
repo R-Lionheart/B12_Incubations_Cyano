@@ -1,4 +1,5 @@
 # Quality control script
+options(scipen = 999)
 
 # Import files  ----------------------------
 filename <- RemoveCsv(list.files(path = 'data_intermediate/', pattern = file.pattern))

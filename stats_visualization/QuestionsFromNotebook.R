@@ -1,10 +1,10 @@
 ## Answering questions from notebook
 
-library(gt)
-library(kableExtra)
-library(paletteer)
-library(patchwork)
-library(superheat)
+#library(gt)
+#library(kableExtra)
+#library(paletteer)
+#library(patchwork)
+#library(superheat)
 library(tidyverse)
 
 options(scipen = 999)
@@ -276,6 +276,9 @@ plotlist <- lapply(SF.Ratios.Plot, plotchart)
 ## Add line to that to show moving directions of compounds.
 ## Cluster them to see whos moving together. Stuff is always going up in deep sea water? Always going down in Time0?
 ## Also just do a set of amino acids for all the graphs. 
+
+## Venn diagram for overlapping compounds between experiments
+## 3D intensity visualizations
 
 ## Good ionizers will be more abundant. 
 ## Does the pathway change under different scenarios?

@@ -1,4 +1,5 @@
 library(tidyverse)
+options(scipen = 999)
 
 replace_nonvalues <- function(x) (gsub(NaN, NA, x))
 
@@ -29,11 +30,34 @@ Incubations <- read.csv("data_processed/MSDial_QE_QC_Output_B12-Incubations.csv"
   select(Replicate.Name, Precursor.Ion.Name, Area, Area.with.QC, QC.Level, Dataset)
 
 
+test.vitamins <- Vitamins_1500QC %>%
+  filter(str_detect(Replicate.Name, "T0")) %>%
+  group_by(Precursor.Ion.Name) %>%
+  mutate(Count = n())
+test.incubations <- Incubations %>%
+  filter(str_detect(Replicate.Name, "T0")) %>%
+  group_by(Precursor.Ion.Name) %>%
+  mutate(Count = n())
+
+
 # Join together
 Complete.Dataset <- Vitamins_1500QC %>%
   rbind(Incubations) %>%
   filter(!str_detect(Precursor.Ion.Name, ","),
          !str_detect(Replicate.Name, "Inj")) %>%
+  mutate(Replicate.Name = recode(Replicate.Name, 
+                                 "171013_Smp_IT0_1" ="171013_Smp_IL1IT0_1", 
+                                 "171013_Smp_IT0_2" = "171013_Smp_IL1IT0_2",
+                                 "171013_Smp_IT0_3" = "171013_Smp_IL1IT0_3",
+                                 "171013_Smp_IT05um_1" = "171013_Smp_IL1IT05um_1",
+                                 "171013_Smp_IT05um_2" = "171013_Smp_IL1IT05um_2",
+                                 "171013_Smp_IT05um_3" = "171013_Smp_IL1IT05um_3",
+                                 "171030_Smp_IT0_1" = "171030_Smp_IL2IT0_1",
+                                 "171030_Smp_IT0_2" = "171030_Smp_IL2IT0_2",
+                                 "171030_Smp_IT0_3" = "171030_Smp_IL2IT0_3",
+                                 "171030_Smp_IT05um_1" = "171030_Smp_IL2IT05um_1",
+                                 "171030_Smp_IT05um_2" = "171030_Smp_IL2IT05um_2",
+                                 "171030_Smp_IT05um_3" = "171030_Smp_IL2IT05um_3")) %>%
   mutate(Size.Fraction = ifelse(str_detect(Replicate.Name, "5um"), "Large.Filter", "Small.Filter"),
          Eddy = ifelse(str_detect(Replicate.Name, "IL1"), "Cyclonic", "Anticyclonic")) %>%
   group_by(Precursor.Ion.Name, Eddy, Size.Fraction) %>%
@@ -44,12 +68,7 @@ Complete.Dataset <- Vitamins_1500QC %>%
   mutate(Binned.Group = ifelse(str_detect(Replicate.Name, "5um"), paste(Binned.Group, "LargeFilter", sep = "_"),
                                paste(Binned.Group, "SmallFilter", sep = "_"))) %>%
   mutate(Binned.Group = ifelse(Eddy == "Cyclonic", paste(Binned.Group, "Cyclonic", sep = "_"), 
-                               paste(Binned.Group, "Anticyclonic", sep = "_"))) %>%
-  group_by(Binned.Group, Precursor.Ion.Name) %>%
-  mutate(replicate = row_number()) %>%
-  unite("Replicate.Bin.Group", c("Binned.Group", "replicate"), sep = "_", remove = FALSE) %>%
-  select(-replicate)
-
+                               paste(Binned.Group, "Anticyclonic", sep = "_")))
 
 write.csv(Complete.Dataset, "data_processed/Vitamins_Incubations_CompleteDataset.csv")
 

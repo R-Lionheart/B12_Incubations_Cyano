@@ -3,65 +3,47 @@ options(scipen = 999)
 
 source("src/Functions.R")
 
-dataset.pattern <- "_AvgCompleteDataset"
-#BMIS.pattern <- "Time0"
+dataset.pattern <- "_CompleteDataset"
 
-## Import your datasets. This will import a lot of information.
+
+## Import your datasets.
 filenames <- RemoveCsv(list.files(path = "data_processed/", pattern = dataset.pattern))
 filepath <- file.path("data_processed", paste(filenames, ".csv", sep = ""))
 for (i in filenames) {
-  filepath <- file.path("data_processed/", paste(i, ".csv", sep = ""))
+  filepath <- file.path("data_processed", paste(i, ".csv", sep = ""))
   assign(make.names(i), read.csv(filepath, stringsAsFactors = FALSE, check.names = FALSE))
 }
 
+AnovaData.Cyano <- Vitamins_Incubations_CompleteDataset %>%
+  select(Precursor.Ion.Name, Area.with.QC, Binned.Group) %>%
+  mutate(Binned.Group = factor(Binned.Group, ordered = TRUE)) %>%
+  group_by(Precursor.Ion.Name) %>%
+  mutate(CountVals = sum(!is.na(Area.with.QC))) %>%
+  filter(CountVals > 2) %>%
+  ungroup()
 
-# BMISd_1_0.2_long <- MakeLong(IsoLagran1_Cyclonic_0.2um_wide_std)
-# BMISd_1_5_long <- MakeLong(IsoLagran1_Cyclonic_5um_wide_std)
-# BMISd_2_0.2_long <- MakeLong(IsoLagran2_Anticyclonic_0.2um_wide_std)
-# BMISd_2_5_long <- MakeLong(IsoLagran2_Anticyclonic_5um_wide_std)
+glimpse(AnovaData.Cyano)
+levels(AnovaData.Cyano$Binned.Group)
 
-# BMISD.normd <- BMISd_1_0.2_long %>%
-#   rbind(BMISd_1_5_long) %>%
-#   rbind(BMISd_2_0.2_long) %>%
-#   rbind(BMISd_2_5_long)
-
-# rm(list=ls(pattern="long|wide"))
-
-
-# Complete BMISd not normd
-
-# filenames <- RemoveCsv(list.files(path = "data_processed/", pattern = BMIS.pattern))
-# filepath <- file.path("data_processed", paste(filenames, ".csv", sep = ""))
-# for (i in filenames) {
-#   filepath <- file.path("data_processed/", paste(i, ".csv", sep = ""))
-#   assign(make.names(i), read.csv(filepath, stringsAsFactors = FALSE, check.names = FALSE))
-# }
-
-# BMISd <- BMISd_Time0_Fixed_2020.07.15
-# grouped.BMISd <- BMISd %>%
-#   left_join(BMISD.normd) %>%
-#   separate(Replicate.Name, into = c("date", "runtype", "SampID", "replicate")) %>%
-#   group_by(Mass.Feature, SampID) %>%
-#   mutate(Avg.Area = mean(Adjusted.Area)) %>%
-#   mutate(Count = n()) %>%
-#   filter(!Count < 3) %>%
-#   ungroup() %>%
-#   mutate(SampID = factor(SampID, ordered = TRUE)) 
-
-For.Anova <- Vitamins_Incubations_AvgCompleteDataset %>%
-  dplyr::mutate(Binned.Group = factor(Binned.Group, ordered = TRUE))
-
-glimpse(For.Anova)
-levels(Vitamins_Incubations_AvgCompleteDataset2$Binned.Group)
-
-# Apply ANOVA to dataframe, summarize and check significance
-AnovaList <- lapply(split(Vitamins_Incubations_AvgCompleteDataset2, Vitamins_Incubations_AvgCompleteDataset2$Precursor.Ion.Name), function(i) {
-  aov(lm(Area.with.QC.mean ~ Binned.Group, data = i))
+AnovaList.Cyano <- lapply(split(AnovaData.Cyano, AnovaData.Cyano$Precursor.Ion.Name), function(i) { 
+  aov(lm(Area.with.QC ~ Binned.Group, data = i))
 })
-AnovaListSummary <- lapply(AnovaList, function(i) {
+AnovaListSummary.Cyano <- lapply(AnovaList.Cyano, function(i) {
   summary(i)
 })
-  
+AnovaDF.Cyano <- as.data.frame(do.call(rbind, lapply(AnovaListSummary.Cyano, function(x) {temp <- unlist(x)})))
+
+
+
+
+
+
+
+
+
+
+
+##############################################################
 # Summarize ANOVA and create dataframe of significance
 AnovaDF <- as.data.frame(do.call(rbind, lapply(AnovaListSummary, function(x) {temp <- unlist(x)})))
 colnames(AnovaDF)[9] <- "AnovaP"
