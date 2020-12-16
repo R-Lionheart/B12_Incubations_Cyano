@@ -31,21 +31,9 @@ AnovaList.Cyano <- lapply(split(AnovaData.Cyano, AnovaData.Cyano$Precursor.Ion.N
 AnovaListSummary.Cyano <- lapply(AnovaList.Cyano, function(i) {
   summary(i)
 })
-AnovaDF.Cyano <- as.data.frame(do.call(rbind, lapply(AnovaListSummary.Cyano, function(x) {temp <- unlist(x)})))
 
-
-
-
-
-
-
-
-
-
-
-##############################################################
 # Summarize ANOVA and create dataframe of significance
-AnovaDF <- as.data.frame(do.call(rbind, lapply(AnovaListSummary, function(x) {temp <- unlist(x)})))
+AnovaDF <- as.data.frame(do.call(rbind, lapply(AnovaListSummary.Cyano, function(x) {temp <- unlist(x)})))
 colnames(AnovaDF)[9] <- "AnovaP"
 AnovaDF$AnovaQ <- p.adjust(AnovaDF$AnovaP, method = "fdr")
 
@@ -55,7 +43,7 @@ AnovaDF <- AnovaDF %>%
   select(Mass.Feature, AnovaP, AnovaQ, AnovaSig) %>%
   arrange(Mass.Feature)
 
-TukeyList <- lapply(AnovaList, function(x) TukeyHSD(x))
+TukeyList <- lapply(AnovaList.Cyano, function(x) TukeyHSD(x))
 TukeyDF <- as.data.frame(do.call(rbind, lapply(TukeyList, function(x) {temp <- unlist(x)}))) %>%
   #select(SampID10:12) %>%
   rownames_to_column("Mass.Feature") %>%

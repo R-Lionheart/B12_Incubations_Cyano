@@ -1,3 +1,4 @@
+library(patchwork)
 library(tidyverse)
 
 options(scipen = 999)
@@ -11,12 +12,72 @@ source("src/Functions.R")
 
 # y axis is peak, x axis is treatment, facet wrap is eddy/sf.
 
-test <- read.csv("data_processed/Vitamins_Incubations_AvgCompleteDataset.csv") %>%
-  select(Precursor.Ion.Name, Area.with.QC.mean, Eddy, Size.Fraction, Replicate.Bin.Group) %>%
-  filter(Precursor.Ion.Name == "Acetyl-L-carnitine") %>%
-  mutate(Replicate.Bin.Group = substr(Replicate.Bin.Group, 1, nchar(Replicate.Bin.Group)-2)) %>%
-  unique() %>%
-  unite("GroupingID", Eddy:Size.Fraction, sep = "_")
+Vitamins.Complete.Set <- read.csv("data_processed/Vitamins_Incubations_CompleteDataset.csv") %>%
+  select(Precursor.Ion.Name, Area.with.QC, Binned.Group) %>%
+  separate(Binned.Group, into = c("SampID", "Eddy", "Fraction"), sep = "_") %>%
+  unite("Grouping.ID", Eddy:Fraction) 
+  
 
-ggplot(test, aes(x = GroupingID, y = Area.with.QC.mean)) +
-  geom_boxplot()
+ANOVAByGroup <- function(df, GroupID) {
+  df.split <- df %>%
+    filter(Grouping.ID == GroupID) %>%
+    mutate(SampID = factor(SampID, ordered = TRUE)) %>%
+    group_by(Precursor.Ion.Name) %>%
+    mutate(CountVals = sum(!is.na(Area.with.QC))) %>%
+    filter(CountVals > 3) %>%
+    ungroup()
+  
+  df.anova <- lapply(split(df.split, df.split$Precursor.Ion.Name), function(i) { 
+    aov(lm(Area.with.QC ~ SampID, data = i))
+  })
+  df.anova.summary <- lapply(df.anova, function(i) {
+    summary(i)
+  })
+  
+  # Summarize ANOVA and create dataframe of significance
+  AnovaDF <- as.data.frame(do.call(rbind, lapply(df.anova.summary, function(x) {temp <- unlist(x)})))
+  colnames(AnovaDF)[9] <- "AnovaP"
+  AnovaDF$AnovaQ <- p.adjust(AnovaDF$AnovaP, method = "fdr")
+  
+  AnovaDF <- AnovaDF %>%
+    rownames_to_column(var = "Mass.Feature") %>%
+    mutate(AnovaSig = ifelse(AnovaQ < 0.1, TRUE, FALSE)) %>%
+    select(Mass.Feature, AnovaP, AnovaQ, AnovaSig) %>%
+    arrange(Mass.Feature)
+  
+  return(AnovaDF)
+}
+
+Cyc_Small <- ANOVAByGroup(Vitamins.Complete.Set, "SmallFilter_Cyclonic") %>%
+  filter(AnovaSig == TRUE) 
+Cyc_Large <- ANOVAByGroup(Vitamins.Complete.Set, "LargeFilter_Cyclonic") %>%
+  filter(AnovaSig == TRUE) 
+Anti_Small <- ANOVAByGroup(Vitamins.Complete.Set, "SmallFilter_Anticyclonic") %>%
+  filter(AnovaSig == TRUE) 
+Anti_Large <- ANOVAByGroup(Vitamins.Complete.Set, "LargeFilter_Anticyclonic") %>%
+  filter(AnovaSig == TRUE) 
+
+common <- Reduce(intersect, list(Cyc_Large$Mass.Feature, Anti_Small$Mass.Feature, Anti_Large$Mass.Feature))
+
+Methylthioadenosine <- Vitamins.Complete.Set %>%
+  filter(Precursor.Ion.Name %in% common) %>%
+  filter(Precursor.Ion.Name == "Methylthioadenosine") %>%
+  mutate(Area.with.QC = ifelse(Grouping.ID == "SmallFilter_Cyclonic", NA, Area.with.QC))
+
+Tyrosine <- Vitamins.Complete.Set %>%
+  filter(Precursor.Ion.Name %in% common) %>%
+  filter(Precursor.Ion.Name == "Tyrosine") %>%
+  mutate(Area.with.QC = ifelse(Grouping.ID == "SmallFilter_Cyclonic", NA, Area.with.QC))
+
+methyl <- ggplot(Methylthioadenosine, aes(x = SampID, y = Area.with.QC, fill = SampID)) +
+  facet_wrap(~ Grouping.ID) +
+  geom_boxplot() +
+  ggtitle("Methylthioadenosine")
+
+tyro <- ggplot(Tyrosine, aes(x = SampID, y = Area.with.QC, fill = SampID)) +
+  facet_wrap(~ Grouping.ID) +
+  geom_boxplot() +
+  ggtitle("Tyrosine")
+
+tyro + methyl
+
