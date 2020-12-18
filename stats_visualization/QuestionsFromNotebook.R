@@ -1,10 +1,5 @@
 ## Answering questions from notebook
 
-#library(gt)
-#library(kableExtra)
-#library(paletteer)
-#library(patchwork)
-#library(superheat)
 library(tidyverse)
 
 options(scipen = 999)
