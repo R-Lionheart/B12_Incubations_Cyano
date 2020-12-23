@@ -82,7 +82,7 @@ Complete.Dataset.Avg <- Complete.Dataset %>%
   mutate_at(c("Area.with.QC.mean"), replace_nonvalues) %>%
   mutate(Area.with.QC.mean = as.numeric(Area.with.QC.mean)) %>%
   select(Precursor.Ion.Name, Size.Fraction, Eddy,
-         Binned.Group, Replicate.Bin.Group, Area.with.QC.mean, Dataset) %>%
+         Binned.Group, Area.with.QC.mean, Dataset) %>%
   unique() %>%
   arrange(Binned.Group) 
 write.csv(Complete.Dataset.Avg, "data_processed/Vitamins_Incubations_AvgCompleteDataset.csv")

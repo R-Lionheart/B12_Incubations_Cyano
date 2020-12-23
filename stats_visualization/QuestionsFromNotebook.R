@@ -1,5 +1,6 @@
 ## Answering questions from notebook
 
+library(forcats)
 library(tidyverse)
 
 options(scipen = 999)
@@ -31,101 +32,8 @@ Standards <- read.csv("https://raw.githubusercontent.com/IngallsLabUW/Ingalls_St
   select(Compound.Name_old, Compound.Type) %>%
   rename(Precursor.Ion.Name = Compound.Name_old)
 
-# Munge vitamin files
-Vitamins_5000QC <- read.csv("data_processed/Skyline_QE_QC_Output_Vitamins_5000QC.csv", stringsAsFactors = FALSE) %>%
-  slice(-1:-9) %>%
-  select(-c(Description, Value)) %>%
-  filter(!str_detect(Replicate.Name, 
-                     "Blk|Std|TruePoo|CultureMED4|Sept29QC|TruePooWeek1|TruePooWeek2|
-                     TruePooWeek3|TruePooWeek4|DSW700m|Process")) %>%
-  separate(Replicate.Name, into = c("Date", "runtype", "Supergroup", "replicate"), remove = FALSE) %>%
-  mutate(QC.Level = "5000") %>%
-  select(Supergroup, Precursor.Ion.Name, Area, Area.with.QC, all.Flags, QC.Level) %>%
-  mutate(Has.Flag = ifelse(is.na(all.Flags), "No Flag", "Flagged Peak"),
-         Dataset = "Vitamins5000")
-
-Vitamins_1500QC <- read.csv("data_processed/Skyline_QE_QC_Output_Vitamins_1500QC.csv") %>%
-  slice(-1:-9) %>%
-  select(-c(Description, Value)) %>%
-  filter(!str_detect(Replicate.Name, 
-                     "Blk|Std|TruePoo|CultureMED4|Sept29QC|TruePooWeek1|TruePooWeek2|
-                     TruePooWeek3|TruePooWeek4|DSW700m|Process")) %>%
-  separate(Replicate.Name, into = c("Date", "runtype", "Supergroup", "replicate"), remove = FALSE) %>%
-  mutate(QC.Level = "1500") %>%
-  select(Supergroup, Precursor.Ion.Name, Area, Area.with.QC, all.Flags, QC.Level) %>%
-  mutate(Has.Flag = ifelse(is.na(all.Flags), "No Flag", "Flagged Peak"),
-         Dataset = "Vitamins1500")
-
-# Munge full Incubations dataset
-Incubations <- read.csv("data_processed/MSDial_QE_QC_Output_B12-Incubations.csv",
-                        stringsAsFactors = FALSE) %>%
-  slice(-1:-6) %>%
-  select(-c(Description, Value)) %>%
-  filter(!str_detect(Replicate.Name, 
-                     "Blk|Std|TruePoo|CultureMED4|Sept29QC|TruePooWeek1|TruePooWeek2|
-                     TruePooWeek3|TruePooWeek4|DSW700m|Process")) %>%
-  separate(Replicate.Name, into = c("Date", "runtype", "Supergroup", "replicate"), remove = FALSE) %>%
-  rename(Precursor.Ion.Name = Metabolite.Name,
-         Area = Area.Value) %>%
-  mutate(QC.Level = "5000") %>%
-  select(Supergroup, Precursor.Ion.Name, Area, Area.with.QC, all.Flags, QC.Level) %>%
-  mutate(Dataset = "Incubations")
-
-## QC Comparisons  --------------------------------------------------
-All.Vitamins <- Vitamins_1500QC %>%
-  rbind(Vitamins_5000QC) %>%
-  group_by(QC.Level, Has.Flag) %>%
-  add_tally() %>%
-  mutate(QC.Level = as.numeric(QC.Level))
-
-## Compare QC filtering
-ggplot(All.Vitamins, aes(x = QC.Level, y = n, fill = Has.Flag)) +
-  geom_bar(position = "dodge", stat = "identity") +
-  geom_text(aes(label=n), position=position_dodge(width = 0.9), 
-            vjust = -0.25, check_overlap = TRUE) +
-  annotate("text", x = 1500, y = 600, label = "510 + 414 = 924") +
-  annotate("text", x = 6000, y = 600, label = "651 + 273 = 924") +
-  ggtitle("Comparison of Area Min Flags in QC Levels: Vitamins")
-
-#ggsave("figures/QC_Comparison.png")
-
-
-## Combine with full Cyano dataset --------------------------------------------------
-Vitamins.for.Analysis <- All.Vitamins %>%
-  ungroup() %>%
-  filter(QC.Level == 1500) %>%
-  select(Supergroup:Dataset, -Has.Flag)
-
-# Join together
-Complete.Dataset <- Vitamins.for.Analysis %>%
-  rbind(Incubations) %>%
-  filter(!str_detect(Precursor.Ion.Name, ",")) %>%
-  mutate(Size.Fraction = ifelse(str_detect(Supergroup, "5um"), "Large.Filter", "Small.Filter"),
-         Eddy = ifelse(str_detect(Supergroup, "IL1"), "Cyclonic", "Anticyclonic"),
-         Dataset = "Vitamins") %>%
-  group_by(Precursor.Ion.Name, Eddy, Size.Fraction) %>%
-  mutate(Binned.Group = ifelse(str_detect(Supergroup, "DSW"), "DeepSeaWater",
-                               ifelse(str_detect(Supergroup, "T0"), "TimeZero",
-                                      ifelse(str_detect(Supergroup, "Control"), "Control",
-                                             ifelse(str_detect(Supergroup, "DMBnoBT|noBT"), "Nutrients", "NoNutrients")))))
-write.csv(Complete.Dataset, "data_intermediate/Vitamins_Incubations_CompleteDataset.csv")
-
-# Filter Vitamins B2-IS and DMB from total dataset averages
-Complete.Dataset.Avg <- Complete.Dataset %>%
-filter(!Precursor.Ion.Name == "B2-IS" && Dataset == "Vitamins",
-       !Precursor.Ion.Name == "DMB" && Dataset == "Vitamins") %>%
-  group_by(Precursor.Ion.Name, Binned.Group, Size.Fraction, Eddy) %>%
-  mutate(Area.mean = mean(Area, na.rm = TRUE),
-         Area.with.QC.mean = mean(Area.with.QC, na.rm = TRUE)) %>%
-  mutate_at(c("Area.with.QC.mean"), replace_nonvalues) %>%
-  mutate(Area.with.QC.mean = as.numeric(Area.with.QC.mean)) %>%
-  select(Precursor.Ion.Name, Size.Fraction, Eddy,
-         Binned.Group, Area.mean, Area.with.QC.mean, Dataset) %>%
-  unique() %>%
-  arrange(Binned.Group)
-write.csv(Complete.Dataset.Avg, "data_intermediate/Vitamins_Incubations_CompleteDatasetAvg.csv")
-
-
+Complete.Dataset <- read.csv("data_processed/Vitamins_Incubations_CompleteDataset.csv")
+Complete.Dataset.Avg <- read.csv("data_processed/Vitamins_Incubations_AvgCompleteDataset.csv")
 # Notebook questions --------------------------------------------------------
 # Which compounds exist in which size fraction?
 Which.Cmpds <- Complete.Dataset %>%
@@ -157,7 +65,6 @@ WhichCompounds <- function(df, EddyDirection) {
     mutate(Number.Of.Samples = n(),
            Number.Missing = sum(is.na(Area.with.QC.mean))) %>%
     filter(Number.Of.Samples != Number.Missing) %>%
-    select(-c(Area.mean, Number.Of.Samples, Number.Missing, Dataset)) %>%
     group_by(Precursor.Ion.Name, Size.Fraction) %>%
     mutate(Is.Present = ifelse(is.na(Area.with.QC.mean), TRUE, FALSE)) %>%
     group_by(Precursor.Ion.Name, Size.Fraction) %>%
@@ -182,15 +89,15 @@ Nutrient.Change <- Complete.Dataset.Avg %>%
   filter(Eddy == "Anticyclonic") %>%
   select(Precursor.Ion.Name, Area.with.QC.mean, Binned.Group, Size.Fraction, Eddy, Dataset) %>%
   unique() %>%
+  mutate(SampID = str_extract(Binned.Group, "[^_]+")) %>%
   filter(!is.na(Area.with.QC.mean)) %>%
   mutate(Area.with.QC.mean = as.numeric(Area.with.QC.mean)) %>%
   mutate(Dataset.Position = ifelse(Area.with.QC.mean > 633000,
                                    "Higher.Average.Area", "Lower.Average.Area")) %>%
-  arrange(desc(Area.with.QC.mean)) %>%
-  mutate(Precursor.Ion.Name=factor(Precursor.Ion.Name, levels=Precursor.Ion.Name))
+  arrange(desc(Area.with.QC.mean)) 
 
 ggplot(Nutrient.Change, aes(x = reorder(Precursor.Ion.Name, -Area.with.QC.mean),
-                            y = Area.with.QC.mean, fill = Binned.Group)) +
+                            y = Area.with.QC.mean, fill = SampID)) +
   geom_bar(position = "dodge", stat = "identity") +
   facet_wrap(~Dataset.Position + Size.Fraction, scales = "free") +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
@@ -202,20 +109,22 @@ ggsave("figures/DoNutrientsChange.png")
 
 ## Do compound proportions stay the same w/ DSW, based on compound type?
 DSWproportions <- Complete.Dataset.Avg %>%
+  mutate(Precursor.Ion.Name = as.character(Precursor.Ion.Name)) %>%
   left_join(Standards) %>%
+  filter(!is.na(Compound.Type)) %>%
   filter(Eddy == "Anticyclonic",
          Size.Fraction == "Large.Filter") %>%
-  ungroup() %>%
-  select(Compound.Type, Binned.Group, Area.with.QC.mean, Size.Fraction, Eddy)
+  group_by(Compound.Type) %>%
+  mutate(Sum.per.CT = sum(Area.with.QC.mean, na.rm = TRUE))
+  
+ggplot(DSWproportions, aes(x = Binned.Group, y = Area.with.QC.mean, fill = Compound.Type)) +
+  geom_bar(stat = "identity", position = "fill") 
 
-ggplot(DSWproportions, aes(x = reorder(Binned.Group, -Area.with.QC.mean),
-                           y = Area.with.QC.mean, fill = Compound.Type)) +
-  geom_bar(stat = "identity", position = "fill") +
-  coord_flip()
-ggsave("figures/DoCompoundProportionsChange_CmpdType.png")
+#ggsave("figures/DoCompoundProportionsChange_CmpdType.png")
 
 
-## Ask a compound: how much of all of the compound are in large/small size fraction? Assume n peak area 0.2
+## Ask a compound: how much of all of the compound are in large/small size fraction? 
+# Assume n peak area 0.2
 # + n peak area 5 = 100%.
 
 plotchart <- function(data) {
@@ -265,7 +174,6 @@ names(SF.Ratios.Plot) <- unique(Size.Fraction.Ratios$Binned.Group)
 plotlist <- lapply(SF.Ratios.Plot, plotchart)
 
 
-## Which ones were completely in one or the other
 ## Check these graphs!! Reorder them.
 ## Box and whisker for how these plots are behaving similarly. Which compounds are behaving the same in all treatments?
 ## Add line to that to show moving directions of compounds.
