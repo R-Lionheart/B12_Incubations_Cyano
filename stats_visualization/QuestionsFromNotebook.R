@@ -10,8 +10,6 @@ source("src/Functions.R")
 replace_nonvalues <- function(x) (gsub(NaN, NA, x))
 
 ## QC threshold is lowered to 1500 for vitamins, compared with ordinary 5000 level
-## S/N flags need to be incorporated
-## DMB should be removed from averaged group, otherwise spikes the overall. 
 
 
 # NUTRIENTS: [DMBnoB12, noB12], both containing a f/2 spike 
@@ -113,12 +111,23 @@ DSWproportions <- Complete.Dataset.Avg %>%
   left_join(Standards) %>%
   filter(!is.na(Compound.Type)) %>%
   filter(Eddy == "Anticyclonic",
-         Size.Fraction == "Large.Filter") %>%
+         Size.Fraction == "Large.Filter")%>%
+  group_by(Binned.Group, Compound.Type) %>%
+  summarize(Sum.per.CT = sum(Area.with.QC.mean, na.rm = TRUE)) %>%
+  filter(Sum.per.CT != 0)
+
+Compound.Type.Levels <- DSWproportions %>%
   group_by(Compound.Type) %>%
-  mutate(Sum.per.CT = sum(Area.with.QC.mean, na.rm = TRUE))
-  
-ggplot(DSWproportions, aes(x = Binned.Group, y = Area.with.QC.mean, fill = Compound.Type)) +
-  geom_bar(stat = "identity", position = "fill") 
+  summarize(Total.Sum = sum(Sum.per.CT)) %>%
+  arrange(desc(Total.Sum)) %>%
+  pull(Compound.Type)
+
+DSWproportions.with.Factor <- DSWproportions %>%
+  mutate(Compound.Type = factor(Compound.Type, levels = Compound.Type.Levels))
+
+ggplot(DSWproportions.with.Factor, aes(x = Binned.Group, y = Sum.per.CT, fill = Compound.Type)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_fill_brewer(palette = "Dark2")
 
 #ggsave("figures/DoCompoundProportionsChange_CmpdType.png")
 
@@ -151,15 +160,15 @@ Size.Fraction.Ratios <- Complete.Dataset.Avg %>%
   mutate(Sum.per.SF = sum(Area.with.QC.mean, na.rm = TRUE)) %>%
   select(Precursor.Ion.Name, Eddy, Size.Fraction, Sum.per.SF, Binned.Group) %>%
   unique() %>%
-  filter(!Sum.per.SF == 0) %>%
+  filter(Sum.per.SF != 0) %>%
   group_by(Precursor.Ion.Name) %>%
   add_tally() %>%
-  filter(!n == 5) %>%
+  filter(n != 5) %>%
   select(-c(Eddy, n)) %>%
   ungroup()
   
 SF.Ratios.Plot <- Size.Fraction.Ratios %>%
-  complete(nesting(Binned.Group, Precursor.Ion.Name), Size.Fraction, fill = list(Sum.per.SF = 0)) %>%
+  #complete(nesting(Binned.Group, Precursor.Ion.Name), Size.Fraction, fill = list(Sum.per.SF = 0)) %>%
   group_by(Binned.Group, Precursor.Ion.Name) %>%
   mutate(Percent = Sum.per.SF / sum(Sum.per.SF)) %>%
   mutate(Large.Filter.Percent = Percent[Size.Fraction == "Large.Filter"]) %>%
