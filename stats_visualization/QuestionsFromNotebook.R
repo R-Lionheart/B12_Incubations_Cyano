@@ -53,7 +53,7 @@ ggplot(Which.Cmpds, aes(x = reorder(Precursor.Ion.Name, -Percent.Present),
   scale_x_discrete(name ="Precursor.Ion.Name") +
   scale_y_continuous(name = "Percent of Samples Present in Dataset") +
   ggtitle("Which Compounds Exist in Which Size Fractions?")
-ggsave("figures/Which.Compounds.Present.png")
+#ggsave("figures/Which.Compounds.Present.png")
 
 # Which compounds were completely in one or the other size fraction?
 WhichCompounds <- function(df, EddyDirection) {
@@ -102,7 +102,7 @@ ggplot(Nutrient.Change, aes(x = reorder(Precursor.Ion.Name, -Area.with.QC.mean),
   scale_y_continuous("QC'd Average Area") +
   scale_x_discrete("Precursor Ion Name") +
   ggtitle("Anticyclonic: Do nutrients change with additions/size fractions?")
-ggsave("figures/DoNutrientsChange.png")
+# ggsave("figures/DoNutrientsChange.png")
 
 
 ## Do compound proportions stay the same w/ DSW, based on compound type?
@@ -149,9 +149,11 @@ plotchart <- function(data) {
   print(plot)
 }
 
+test <- Complete.Dataset.Avg %>%
+  mutate(Binned.Group = str_extract(Binned.Group, "[^_]+"))
+  
 
-# Split by eddy orientation
-Size.Fraction.Ratios <- Complete.Dataset.Avg %>%
+Size.Fraction.Ratios <- test %>%
   ungroup() %>%
   filter(Eddy == "Anticyclonic") %>%
   mutate_at(c("Area.with.QC.mean"), replace_nonvalues) %>%
@@ -168,7 +170,7 @@ Size.Fraction.Ratios <- Complete.Dataset.Avg %>%
   ungroup()
   
 SF.Ratios.Plot <- Size.Fraction.Ratios %>%
-  #complete(nesting(Binned.Group, Precursor.Ion.Name), Size.Fraction, fill = list(Sum.per.SF = 0)) %>%
+  complete(nesting(Binned.Group, Precursor.Ion.Name), Size.Fraction, fill = list(Sum.per.SF = 0)) %>%
   group_by(Binned.Group, Precursor.Ion.Name) %>%
   mutate(Percent = Sum.per.SF / sum(Sum.per.SF)) %>%
   mutate(Large.Filter.Percent = Percent[Size.Fraction == "Large.Filter"]) %>%
@@ -183,7 +185,6 @@ names(SF.Ratios.Plot) <- unique(Size.Fraction.Ratios$Binned.Group)
 plotlist <- lapply(SF.Ratios.Plot, plotchart)
 
 
-## Check these graphs!! Reorder them.
 ## Box and whisker for how these plots are behaving similarly. Which compounds are behaving the same in all treatments?
 ## Add line to that to show moving directions of compounds.
 ## Cluster them to see whos moving together. Stuff is always going up in deep sea water? Always going down in Time0?

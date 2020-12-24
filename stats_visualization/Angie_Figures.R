@@ -16,7 +16,6 @@ Vitamins.Complete.Set <- read.csv("data_processed/Vitamins_Incubations_CompleteD
   select(Precursor.Ion.Name, Area.with.QC, Binned.Group) %>%
   separate(Binned.Group, into = c("SampID", "Eddy", "Fraction"), sep = "_") %>%
   unite("Grouping.ID", Eddy:Fraction) 
-  
 
 ANOVAByGroup <- function(df, GroupID) {
   df.split <- df %>%
@@ -24,7 +23,7 @@ ANOVAByGroup <- function(df, GroupID) {
     mutate(SampID = factor(SampID, ordered = TRUE)) %>%
     group_by(Precursor.Ion.Name) %>%
     mutate(CountVals = sum(!is.na(Area.with.QC))) %>%
-    filter(CountVals > 3) %>%
+    filter(CountVals > 2) %>%
     ungroup()
   
   df.anova <- lapply(split(df.split, df.split$Precursor.Ion.Name), function(i) { 
