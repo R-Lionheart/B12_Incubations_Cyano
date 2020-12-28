@@ -12,7 +12,7 @@ source("src/Functions.R")
 
 # y axis is peak, x axis is treatment, facet wrap is eddy/sf.
 
-Vitamins.Complete.Set <- read.csv("data_processed/Vitamins_Incubations_CompleteDataset.csv") %>%
+Vitamins.Complete.Set <- read.csv("data_processed/Vitamins_Incubations_CompleteDataset.csv") %>% 
   select(Precursor.Ion.Name, Area.with.QC, Binned.Group) %>%
   separate(Binned.Group, into = c("SampID", "Eddy", "Fraction"), sep = "_") %>%
   unite("Grouping.ID", Eddy:Fraction) 

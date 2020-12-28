@@ -30,16 +30,6 @@ Incubations <- read.csv("data_processed/MSDial_QE_QC_Output_B12-Incubations.csv"
   select(Replicate.Name, Precursor.Ion.Name, Area, Area.with.QC, QC.Level, Dataset)
 
 
-test.vitamins <- Vitamins_1500QC %>%
-  filter(str_detect(Replicate.Name, "T0")) %>%
-  group_by(Precursor.Ion.Name) %>%
-  mutate(Count = n())
-test.incubations <- Incubations %>%
-  filter(str_detect(Replicate.Name, "T0")) %>%
-  group_by(Precursor.Ion.Name) %>%
-  mutate(Count = n())
-
-
 # Join together
 Complete.Dataset <- Vitamins_1500QC %>%
   rbind(Incubations) %>%
