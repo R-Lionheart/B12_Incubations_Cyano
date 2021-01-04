@@ -3,29 +3,18 @@ options(scipen = 999)
 
 source("src/Functions.R")
 
-#AnovaData.Cyano <- read.csv("~/Downloads/CorrectCyanoANOVA.csv") %>%
-AnovaData.Cyano <- read.csv("data_processed/Vitamins_Incubations_CompleteDataset.csv") %>%
-  select(Precursor.Ion.Name, Area.with.QC, Binned.Group) 
-
-# correct.PIN <- as.data.frame(sort(unique(AnovaData.Cyano$Precursor.Ion.Name))) %>%
-#   rename(PIN = 1) %>%
-#   mutate(PIN = as.character(PIN))
-# wrong.PIN <- as.data.frame(sort(unique(Vitamins.Complete.Set$Precursor.Ion.Name))) %>%
-#   rename(PIN = 1) %>%
-#   mutate(PIN = as.character(PIN))
-# 
-# diff <- setdiff(correct.PIN, wrong.PIN)
-
+Correct.AnovaData <- read.csv("data_raw/CorrectCyanoANOVA.csv") %>%
+  select(Precursor.Ion.Name, Area.with.QC, Binned.Group) %>%
   mutate(Binned.Group = factor(Binned.Group, ordered = TRUE)) %>%
   group_by(Precursor.Ion.Name) %>%
   mutate(CountVals = sum(!is.na(Area.with.QC))) %>%
   filter(CountVals > 2) %>%
   ungroup()
 
-glimpse(AnovaData.Cyano)
-levels(AnovaData.Cyano$Binned.Group)
+glimpse(Correct.AnovaData)
+levels(Correct.AnovaData$Binned.Group)
 
-AnovaList.Cyano <- lapply(split(AnovaData.Cyano, AnovaData.Cyano$Precursor.Ion.Name), function(i) { 
+AnovaList.Cyano <- lapply(split(Correct.AnovaData, Correct.AnovaData$Precursor.Ion.Name), function(i) { 
   aov(lm(Area.with.QC ~ Binned.Group, data = i))
 })
 AnovaListSummary.Cyano <- lapply(AnovaList.Cyano, function(i) {
@@ -33,17 +22,17 @@ AnovaListSummary.Cyano <- lapply(AnovaList.Cyano, function(i) {
 })
 AnovaDF.Cyano <- as.data.frame(do.call(rbind, lapply(AnovaListSummary.Cyano, function(x) {temp <- unlist(x)})))
 
+correct.PIN <- as.data.frame(sort(unique(Correct.AnovaData$Precursor.Ion.Name))) %>%
+  rename(PIN = 1) %>%
+  mutate(PIN = as.character(PIN))
+wrong.PIN <- as.data.frame(sort(unique(Vitamins.Complete.Set$Precursor.Ion.Name))) %>%
+  rename(PIN = 1) %>%
+  mutate(PIN = as.character(PIN))
 
+diff <- setdiff(correct.PIN, wrong.PIN)
 
-
-
-
-
-
-
-##############################################################
 # Summarize ANOVA and create dataframe of significance
-AnovaDF <- as.data.frame(do.call(rbind, lapply(AnovaListSummary, function(x) {temp <- unlist(x)})))
+AnovaDF <- as.data.frame(do.call(rbind, lapply(AnovaListSummary.Cyano, function(x) {temp <- unlist(x)})))
 colnames(AnovaDF)[9] <- "AnovaP"
 AnovaDF$AnovaQ <- p.adjust(AnovaDF$AnovaP, method = "fdr")
 
@@ -53,13 +42,13 @@ AnovaDF <- AnovaDF %>%
   select(Mass.Feature, AnovaP, AnovaQ, AnovaSig) %>%
   arrange(Mass.Feature)
 
-TukeyList <- lapply(AnovaList, function(x) TukeyHSD(x))
+TukeyList <- lapply(AnovaList.Cyano, function(x) TukeyHSD(x))
 TukeyDF <- as.data.frame(do.call(rbind, lapply(TukeyList, function(x) {temp <- unlist(x)}))) %>%
   #select(SampID10:12) %>%
   rownames_to_column("Mass.Feature") %>%
   arrange(Mass.Feature)
 
-toPlot <- grouped.BMISd %>%
+toPlot <- Correct.AnovaData %>%
   left_join(AnovaDF) %>%
   group_by(Mass.Feature, SampID) %>%
   mutate(AveSmp = mean(Area.BMISd.Normd, na.rm = TRUE)) %>%

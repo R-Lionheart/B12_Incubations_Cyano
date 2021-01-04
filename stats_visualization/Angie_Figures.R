@@ -12,11 +12,31 @@ source("src/Functions.R")
 
 # y axis is peak, x axis is treatment, facet wrap is eddy/sf.
 
-Vitamins.Complete.Set <- read.csv("data_processed/Vitamins_Incubations_CompleteDataset.csv") %>% 
+#### NOT COMPLETE UNTIL ANOVA ISSUES ARE RESOLVED ####
+Vitamins.Complete.Set <-  read.csv("data_processed/Vitamins_Incubations_CompleteDataset.csv") %>% 
   select(Precursor.Ion.Name, Area.with.QC, Binned.Group) %>%
-  separate(Binned.Group, into = c("SampID", "Eddy", "Fraction"), sep = "_") %>%
-  unite("Grouping.ID", Eddy:Fraction) 
+  mutate(Binned.Group = factor(Binned.Group, ordered = TRUE)) %>%
+  group_by(Precursor.Ion.Name) %>%
+  mutate(CountVals = sum(!is.na(Area.with.QC))) %>%
+  filter(CountVals > 2) %>%
+  ungroup() #%>%
+  ###
+  # separate(Binned.Group, c("SampID", "B", "C")) %>%
+  # unite("Grouping.ID", B:C)
 
+glimpse(Vitamins.Complete.Set)
+levels(Vitamins.Complete.Set$Binned.Group)
+
+VCS.Anova <- lapply(split(Vitamins.Complete.Set, Vitamins.Complete.Set$Precursor.Ion.Name), function(i) {
+  aov(lm(Area.with.QC ~ Binned.Group, data = i))
+})
+VCS.Summary <- lapply(VCS.Anova, function(i) {
+  summary(i)
+})
+VCS.AnovaDF <- as.data.frame(do.call(rbind, lapply(VCS.Summary, function(x) {temp <- unlist(x)})))
+######################################################
+
+## Not working with either set.
 ANOVAByGroup <- function(df, GroupID) {
   df.split <- df %>%
     filter(Grouping.ID == GroupID) %>%
@@ -47,9 +67,9 @@ ANOVAByGroup <- function(df, GroupID) {
   return(AnovaDF)
 }
 
-Cyc_Small <- ANOVAByGroup(Vitamins.Complete.Set, "SmallFilter_Cyclonic") %>%
+Cyc_Small <- ANOVAByGroup(TESTING, "SmallFilter_Cyclonic") %>%
   filter(AnovaSig == TRUE) 
-Cyc_Large <- ANOVAByGroup(Vitamins.Complete.Set, "LargeFilter_Cyclonic") %>%
+Cyc_Large <- ANOVAByGroup(TESTING, "LargeFilter_Cyclonic") %>%
   filter(AnovaSig == TRUE) 
 Anti_Small <- ANOVAByGroup(Vitamins.Complete.Set, "SmallFilter_Anticyclonic") %>%
   filter(AnovaSig == TRUE) 
