@@ -19,10 +19,9 @@ Vitamins.Complete.Set <-  read.csv("data_processed/Vitamins_Incubations_Complete
   group_by(Precursor.Ion.Name) %>%
   mutate(CountVals = sum(!is.na(Area.with.QC))) %>%
   filter(CountVals > 2) %>%
-  ungroup() #%>%
-  ###
-  # separate(Binned.Group, c("SampID", "B", "C")) %>%
-  # unite("Grouping.ID", B:C)
+  ungroup() %>%
+  separate(Binned.Group, c("SampID", "B", "C")) %>%
+  unite("Grouping.ID", B:C)
 
 glimpse(Vitamins.Complete.Set)
 levels(Vitamins.Complete.Set$Binned.Group)
@@ -34,7 +33,6 @@ VCS.Summary <- lapply(VCS.Anova, function(i) {
   summary(i)
 })
 VCS.AnovaDF <- as.data.frame(do.call(rbind, lapply(VCS.Summary, function(x) {temp <- unlist(x)})))
-######################################################
 
 ## Not working with either set.
 ANOVAByGroup <- function(df, GroupID) {
@@ -43,21 +41,21 @@ ANOVAByGroup <- function(df, GroupID) {
     mutate(SampID = factor(SampID, ordered = TRUE)) %>%
     group_by(Precursor.Ion.Name) %>%
     mutate(CountVals = sum(!is.na(Area.with.QC))) %>%
-    filter(CountVals > 2) %>%
+    filter(CountVals > 6) %>%
     ungroup()
   
-  df.anova <- lapply(split(df.split, df.split$Precursor.Ion.Name), function(i) { 
+  df.anova <- lapply(split(df.split, df.split$Precursor.Ion.Name), function(i) {
     aov(lm(Area.with.QC ~ SampID, data = i))
   })
   df.anova.summary <- lapply(df.anova, function(i) {
     summary(i)
   })
-  
+
   # Summarize ANOVA and create dataframe of significance
   AnovaDF <- as.data.frame(do.call(rbind, lapply(df.anova.summary, function(x) {temp <- unlist(x)})))
   colnames(AnovaDF)[9] <- "AnovaP"
   AnovaDF$AnovaQ <- p.adjust(AnovaDF$AnovaP, method = "fdr")
-  
+
   AnovaDF <- AnovaDF %>%
     rownames_to_column(var = "Mass.Feature") %>%
     mutate(AnovaSig = ifelse(AnovaQ < 0.1, TRUE, FALSE)) %>%
@@ -67,9 +65,9 @@ ANOVAByGroup <- function(df, GroupID) {
   return(AnovaDF)
 }
 
-Cyc_Small <- ANOVAByGroup(TESTING, "SmallFilter_Cyclonic") %>%
+Cyc_Small <- ANOVAByGroup(Vitamins.Complete.Set, "SmallFilter_Cyclonic") %>%
   filter(AnovaSig == TRUE) 
-Cyc_Large <- ANOVAByGroup(TESTING, "LargeFilter_Cyclonic") %>%
+Cyc_Large <- ANOVAByGroup(Vitamins.Complete.Set, "LargeFilter_Cyclonic") %>%
   filter(AnovaSig == TRUE) 
 Anti_Small <- ANOVAByGroup(Vitamins.Complete.Set, "SmallFilter_Anticyclonic") %>%
   filter(AnovaSig == TRUE) 
