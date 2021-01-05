@@ -12,7 +12,6 @@ source("src/Functions.R")
 
 # y axis is peak, x axis is treatment, facet wrap is eddy/sf.
 
-#### NOT COMPLETE UNTIL ANOVA ISSUES ARE RESOLVED ####
 Vitamins.Complete.Set <-  read.csv("data_processed/Vitamins_Incubations_CompleteDataset.csv") %>% 
   select(Precursor.Ion.Name, Area.with.QC, Binned.Group) %>%
   mutate(Binned.Group = factor(Binned.Group, ordered = TRUE)) %>%
@@ -34,7 +33,6 @@ VCS.Summary <- lapply(VCS.Anova, function(i) {
 })
 VCS.AnovaDF <- as.data.frame(do.call(rbind, lapply(VCS.Summary, function(x) {temp <- unlist(x)})))
 
-## Not working with either set.
 ANOVAByGroup <- function(df, GroupID) {
   df.split <- df %>%
     filter(Grouping.ID == GroupID) %>%
@@ -74,27 +72,16 @@ Anti_Small <- ANOVAByGroup(Vitamins.Complete.Set, "SmallFilter_Anticyclonic") %>
 Anti_Large <- ANOVAByGroup(Vitamins.Complete.Set, "LargeFilter_Anticyclonic") %>%
   filter(AnovaSig == TRUE) 
 
-common <- Reduce(intersect, list(Cyc_Large$Mass.Feature, Anti_Small$Mass.Feature, Anti_Large$Mass.Feature))
+common <- Reduce(intersect, list(Cyc_Large$Mass.Feature, Cyc_Small$Mass.Feature,
+                                 Anti_Large$Mass.Feature, Anti_Small$Mass.Feature))
 
-Methylthioadenosine <- Vitamins.Complete.Set %>%
-  filter(Precursor.Ion.Name %in% common) %>%
-  filter(Precursor.Ion.Name == "Methylthioadenosine") %>%
-  mutate(Area.with.QC = ifelse(Grouping.ID == "SmallFilter_Cyclonic", NA, Area.with.QC))
+Tryptophan <- Vitamins.Complete.Set %>%
+  filter(Precursor.Ion.Name %in% common)
 
-Tyrosine <- Vitamins.Complete.Set %>%
-  filter(Precursor.Ion.Name %in% common) %>%
-  filter(Precursor.Ion.Name == "Tyrosine") %>%
-  mutate(Area.with.QC = ifelse(Grouping.ID == "SmallFilter_Cyclonic", NA, Area.with.QC))
 
-methyl <- ggplot(Methylthioadenosine, aes(x = SampID, y = Area.with.QC, fill = SampID)) +
-  facet_wrap(~ Grouping.ID) +
+trypto <- ggplot(Tryptophan, aes(x = SampID, y = Area.with.QC, fill = SampID)) +
+  facet_wrap(~ Grouping.ID, scales = "free") +
   geom_boxplot() +
-  ggtitle("Methylthioadenosine")
-
-tyro <- ggplot(Tyrosine, aes(x = SampID, y = Area.with.QC, fill = SampID)) +
-  facet_wrap(~ Grouping.ID) +
-  geom_boxplot() +
-  ggtitle("Tyrosine")
-
-tyro + methyl
-
+  scale_fill_grey() +
+  ggtitle("Tryptophan")
+print(trypto)
