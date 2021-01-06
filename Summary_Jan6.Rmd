@@ -6,6 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library(kableExtra)
 library(knitr)
 library(tidyverse)
 knitr::opts_chunk$set(echo = TRUE)
@@ -15,11 +16,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #### QC threshold is lowered to 1500 for vitamins, compared with ordinary 5000 level
 
-NUTRIENTS: [DMBnoB12, noB12], both containing a f/2 spike 
-NONUTRIENTS: [WB12, WDMB], no additional nutrients added.
-DEEPSEAWATER: [DSW], 10% Deep Sea Water (DSW) taken from 700 m, filtered and evenly mixed with 90% in situ water from 25 m. This mixture was then incubated and filtered. 
-TIME 0: [T0] In situ condition at the start of the experiment, aka time 0.
-CONTROL: [Control], 100% in situ water from 25 m, incubated and then filtered.
+- NUTRIENTS: [DMBnoB12, noB12], both containing a f/2 spike 
+- NONUTRIENTS: [WB12, WDMB], no additional nutrients added 
+- DEEPSEAWATER: [DSW], 10% Deep Sea Water (DSW) taken from 700 m, filtered and evenly mixed with 90% in situ water from 25 m 
+- TIME 0: [T0] In situ condition at the start of the experiment, aka time 0 
+- CONTROL: [Control], 100% in situ water from 25 m, incubated and then filtered 
 ---
 
 #### QE + TQS QC parameters
@@ -50,12 +51,20 @@ Complete.Dataset <- read.csv("data_processed/Vitamins_Incubations_CompleteDatase
 Complete.Dataset.Avg <- read.csv("data_processed/Vitamins_Incubations_AvgCompleteDataset.csv")
 ```
 
-## Notebook questions --------------------------------------------------------
-Which compounds exist in which size fraction?
+### Questions
+### Which amino acids exist in which size fraction?
 How many of the samples show up in each size fraction? What is the quality distribution of what exists where?
 
-```{r Which Compounds, include=TRUE}
+```{r Which Compounds, include=FALSE}
+Standards <- read.csv("https://raw.githubusercontent.com/IngallsLabUW/Ingalls_Standards/master/Ingalls_Lab_Standards_NEW.csv",
+                               stringsAsFactors = FALSE, header = TRUE) %>%
+  select(Compound.Name_old, Compound.Type) %>%
+  rename(Precursor.Ion.Name = Compound.Name_old)
+
 Which.Cmpds <- Complete.Dataset %>%
+  mutate(Precursor.Ion.Name = as.character(Precursor.Ion.Name)) %>%
+  left_join(Standards) %>%
+  filter(Compound.Type == "Amino Acid") %>%
   group_by(Precursor.Ion.Name, Size.Fraction) %>%
   mutate(
     Number.Of.Samples = n(),
@@ -72,14 +81,14 @@ which.compounds <- ggplot(Which.Cmpds, aes(x = reorder(Precursor.Ion.Name, -Perc
   scale_fill_discrete(guide = "none") +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.25)) +
   scale_x_discrete(name ="Precursor.Ion.Name") +
-  scale_y_continuous(name = "Percent of Samples Present in Dataset") +
-  ggtitle("Which Compounds Exist in Which Size Fractions?")
-print(which.compounds)
-
+  scale_y_continuous(name = "Percent of Samples Present in Dataset") 
+ggsave("figures/Which.Compounds.Present.png")
 ```
 
-## Which compounds were *completely* in one or the other size fraction?
-```{r, include=TRUE}
+![](figures/Which.Compounds.Present.png)
+
+### Which compounds were *completely* in one or the other size fraction?
+```{r, include=FALSE}
 WhichCompounds <- function(df, EddyDirection) {
   Table.DF <- df %>%
     filter(Eddy == EddyDirection) %>%
@@ -103,10 +112,16 @@ WhichCompounds <- function(df, EddyDirection) {
 
 Table.DF.Cyclonic <- WhichCompounds(Complete.Dataset.Avg, "Cyclonic")
 Table.DF.Anticyclonic <- WhichCompounds(Complete.Dataset.Avg, "Anticyclonic")
-kable(Table.DF.Cyclonic)
-kable(Table.DF.Anticyclonic)
-
 ```
+
+```{r, include=TRUE}
+Table.DF.Cyclonic %>%
+  kable(booktabs = T)
+Table.DF.Anticyclonic %>% 
+  kable(booktabs = T) %>%
+  row_spec(which(Table.DF.Anticyclonic$Size.Fraction == "Small.Filter"), color = "red")
+```
+
 
 ## Which compounds have 100% of the samples present, versus those that have no samples present?
 Remember that this is *after QC*, but before averaging and DMB/B2-IS removal.
@@ -124,16 +139,16 @@ AllSamplesPresent <- function(df, EddyDirection) {
     unique()
   return(samples.present)
 }
-WhichCompoundsTableCyc <- AllSamplesPresent(Complete.Dataset, "Cyclonic")
-WhichCompoundsTableAntiCyc <- AllSamplesPresent(Complete.Dataset, "Anticyclonic")
+WhichCompoundsTableCyc <- AllSamplesPresent(Complete.Dataset, "Cyclonic, Both Size Fractions")
+WhichCompoundsTableAntiCyc <- AllSamplesPresent(Complete.Dataset, "Anticyclonic, Both Size Fractions")
 
-kable(WhichCompoundsTableCyc, caption = "Compounds In Only One Size Fraction, Cyclonic")
-kable(WhichCompoundsTableAntiCyc, caption = "Compounds In Only One Size Fraction, Anticyclonic")
+kable(WhichCompoundsTableCyc, caption = "Cyclonic")
+kable(WhichCompoundsTableAntiCyc, caption = "Anticyclonic")
 ```
 
 
-## Do nutrients change with additions/size fractions?
-```{r, include=TRUE}
+### Do nutrients change with additions/size fractions?
+```{r, include=FALSE}
 Nutrient.Change <- Complete.Dataset.Avg %>%
   filter(Eddy == "Anticyclonic") %>%
   select(Precursor.Ion.Name, Area.with.QC.mean, Binned.Group, Size.Fraction, Eddy, Dataset) %>%
@@ -153,17 +168,12 @@ nutrient.change.plot <- ggplot(Nutrient.Change, aes(x = reorder(Precursor.Ion.Na
   scale_y_continuous("QC'd Average Area") +
   scale_x_discrete("Precursor Ion Name") +
   ggtitle("Anticyclonic: Do nutrients change with additions/size fractions?")
-ggsave("figures/DoNutrientsChange.png")
+ggsave("figures/DoNutrientsChange.png", width = 10, height = 7)
 ```
-![Are Nutrients Changing?.](figures/DoNutrientsChange.png)
+![](figures/DoNutrientsChange.png)
 
-# Do compound proportions stay the same w/ DSW, based on compound type?
-```{r, include=TRUE}
-Standards <- read.csv("https://raw.githubusercontent.com/IngallsLabUW/Ingalls_Standards/master/Ingalls_Lab_Standards_NEW.csv",
-                               stringsAsFactors = FALSE, header = TRUE) %>%
-  select(Compound.Name_old, Compound.Type) %>%
-  rename(Precursor.Ion.Name = Compound.Name_old)
-
+### Do compound proportions stay the same w/ DSW, based on compound type?
+```{r, include=FALSE}
 DSWproportions <- Complete.Dataset.Avg %>%
   mutate(Precursor.Ion.Name = as.character(Precursor.Ion.Name)) %>%
   left_join(Standards) %>%
@@ -189,16 +199,19 @@ DSWproportions.with.Factor$Binned.Group <- factor(DSWproportions.with.Factor$Bin
                                                            "Nutrients_LargeFilter_Anticyclonic",
                                                            "NoNutrients_LargeFilter_Anticyclonic"))
 
-ggplot(DSWproportions.with.Factor, aes(x = Binned.Group, y = Sum.per.CT, fill = Compound.Type)) +
+DSW.plot <- ggplot(DSWproportions.with.Factor, aes(x = Binned.Group, y = Sum.per.CT, fill = Compound.Type)) +
   geom_bar(stat = "identity", position = "fill") +
   theme(axis.text.x = element_text(angle = 90)) +
   scale_fill_brewer(palette = "Dark2") +
   ggtitle("Deep Sea Water Proportions")
+ggsave("figures/DSW_Proportions.png", width = 7, height = 10)
 
 ```
 
-## How much of all the compound is in each size fraction?
-```{r, include=TRUE}
+![](figures/DSW_Proportions.png)
+
+### How much of all the compound is in each size fraction?
+```{r, include=FALSE}
 replace_nonvalues <- function(x) (gsub(NaN, NA, x))
 
 plotchart <- function(data) {
@@ -250,32 +263,11 @@ names(SF.Ratios.Plot) <- unique(Size.Fraction.Ratios$Binned.Group)
 plotlist <- lapply(SF.Ratios.Plot, plotchart)
 ```
 
-## Find mass features that are significantly different between treatments in all SF, Eddy variations (four total).
+### Find mass features that are significantly different between treatments in all SF, Eddy variations (four total).
 
 The y axis is peak, x axis is treatment, facet wrap is eddy/sf.
 
-```{r, include=TRUE}
-Vitamin.Complete.Set <- Complete.Dataset %>% 
-  select(Precursor.Ion.Name, Area.with.QC, Binned.Group) %>%
-  mutate(Binned.Group = factor(Binned.Group, ordered = TRUE)) %>%
-  group_by(Precursor.Ion.Name) %>%
-  mutate(CountVals = sum(!is.na(Area.with.QC))) %>%
-  filter(CountVals > 2) %>%
-  ungroup() %>%
-  separate(Binned.Group, c("SampID", "B", "C")) %>%
-  unite("Grouping.ID", B:C)
-
-glimpse(Vitamin.Complete.Set)
-levels(Vitamin.Complete.Set$Binned.Group)
-
-# Vitamin.Complete.Set.Anova <- lapply(split(Vitamin.Complete.Set, Vitamin.Complete.Set$Precursor.Ion.Name), function(i) {
-#   aov(lm(Area.with.QC ~ Binned.Group, data = i))
-# })
-# Vitamin.Complete.Set.Summary <- lapply(Vitamin.Complete.Set.Anova, function(i) {
-#   summary(i)
-# })
-# Vitamin.Complete.Set.AnovaDF <- as.data.frame(do.call(rbind, lapply(Vitamin.Complete.Set.Summary, function(x) {temp <- unlist(x)})))
-
+```{r, include=FALSE}
 ANOVAByGroup <- function(df, GroupID) {
   df.split <- df %>%
     filter(Grouping.ID == GroupID) %>%
@@ -306,6 +298,16 @@ ANOVAByGroup <- function(df, GroupID) {
   return(AnovaDF)
 }
 
+Vitamin.Complete.Set <- Complete.Dataset %>% 
+  select(Precursor.Ion.Name, Area.with.QC, Binned.Group) %>%
+  mutate(Binned.Group = factor(Binned.Group, ordered = TRUE)) %>%
+  group_by(Precursor.Ion.Name) %>%
+  mutate(CountVals = sum(!is.na(Area.with.QC))) %>%
+  filter(CountVals > 2) %>%
+  ungroup() %>%
+  separate(Binned.Group, c("SampID", "B", "C")) %>%
+  unite("Grouping.ID", B:C)
+
 Cyc_Small <- ANOVAByGroup(Vitamin.Complete.Set, "SmallFilter_Cyclonic") %>%
   filter(AnovaSig == TRUE) 
 Cyc_Large <- ANOVAByGroup(Vitamin.Complete.Set, "LargeFilter_Cyclonic") %>%
@@ -326,7 +328,7 @@ Tryptophan.plot <- ggplot(Tryptophan, aes(x = SampID, y = Area.with.QC, fill = S
   facet_wrap(~ Grouping.ID, scales = "free") +
   geom_boxplot() +
   scale_fill_grey() +
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90)) +
   ggtitle("Tryptophan")
 print(Tryptophan.plot)
 
