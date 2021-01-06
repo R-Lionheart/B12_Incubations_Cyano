@@ -11,7 +11,6 @@ replace_nonvalues <- function(x) (gsub(NaN, NA, x))
 
 ## QC threshold is lowered to 1500 for vitamins, compared with ordinary 5000 level
 
-
 # NUTRIENTS: [DMBnoB12, noB12], both containing a f/2 spike 
 
 # NONUTRIENTS: [WB12, WDMB], no additional nutrients added.
@@ -123,11 +122,19 @@ Compound.Type.Levels <- DSWproportions %>%
   pull(Compound.Type)
 
 DSWproportions.with.Factor <- DSWproportions %>%
-  mutate(Compound.Type = factor(Compound.Type, levels = Compound.Type.Levels))
+  mutate(Compound.Type = factor(Compound.Type, levels = Compound.Type.Levels)) 
+DSWproportions.with.Factor$Binned.Group <- factor(DSWproportions.with.Factor$Binned.Group,
+                                                  levels=c("DeepSeaWater_LargeFilter_Anticyclonic",
+                                                           "Control_LargeFilter_Anticyclonic",
+                                                           "TimeZero_LargeFilter_Anticyclonic",
+                                                           "Nutrients_LargeFilter_Anticyclonic",
+                                                           "NoNutrients_LargeFilter_Anticyclonic"))
 
 ggplot(DSWproportions.with.Factor, aes(x = Binned.Group, y = Sum.per.CT, fill = Compound.Type)) +
   geom_bar(stat = "identity", position = "fill") +
-  scale_fill_brewer(palette = "Dark2")
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_fill_brewer(palette = "Dark2") +
+  ggtitle("Deep Sea Water Proportions")
 
 #ggsave("figures/DoCompoundProportionsChange_CmpdType.png")
 
