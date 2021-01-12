@@ -2,7 +2,9 @@
 title: "Summary Jan 6"
 author: "RLionheart"
 date: "01/06/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -21,27 +23,16 @@ knitr::opts_chunk$set(echo = TRUE)
 - DEEPSEAWATER: [DSW], 10% Deep Sea Water (DSW) taken from 700 m, filtered and evenly mixed with 90% in situ water from 25 m 
 - TIME 0: [T0] In situ condition at the start of the experiment, aka time 0 
 - CONTROL: [Control], 100% in situ water from 25 m, incubated and then filtered 
+
 ---
 
 #### QE + TQS QC parameters
 
-The below QC conditions are modified to reflect the Vitamins run. Lower area and height min.
+The area QC conditions were modified to reflect the Vitamins run, from 5000 min to 1500 min.
+The overall Cyano run was QC'd using the normal 5000 cutoff.
 
-* **area.min   <- 1500 # HILIC - 1000, Cyano - 5000**
-* RT.flex    <- 0.2 # HILIC +/- 0.4 min, Cyano +/- 0.2 min
-* blk.thresh <- 0.2 # HILIC +/- 0.3, Cyano +/- 0.2
-* SN.min     <- 4 # HILIC - 4, Cyano - 4
-* height.max <- 1.0e8
-* height.min <- 1000
-
-These QC conditions are for the rest of the Cyano run, and reflect ordinary QC levels. 
-
-* **area.min   <- 5000 # HILIC - 1000, Cyano - 5000**
-* RT.flex    <- 0.2 # HILIC +/- 0.4 min, Cyano +/- 0.2 min
-* blk.thresh <- 0.2 # HILIC +/- 0.3, Cyano +/- 0.2
-* SN.min     <- 4 # HILIC - 4, Cyano - 4
-* height.max <- 1.0e8
-* height.min <- 1000
+* **area.min   <- 1500** for vitamins
+* **area.min   <- 5000** for Cyano run
 
 ---
 
@@ -52,8 +43,9 @@ Complete.Dataset.Avg <- read.csv("data_processed/Vitamins_Incubations_AvgComplet
 ```
 
 ### Questions
-### Which amino acids exist in which size fraction?
-How many of the samples show up in each size fraction? What is the quality distribution of what exists where?
+### Which compounds exist in which size fraction?
+
+How many of the samples show up in each size fraction? 
 
 ```{r Which Compounds, include=FALSE}
 Standards <- read.csv("https://raw.githubusercontent.com/IngallsLabUW/Ingalls_Standards/master/Ingalls_Lab_Standards_NEW.csv",
@@ -61,7 +53,7 @@ Standards <- read.csv("https://raw.githubusercontent.com/IngallsLabUW/Ingalls_St
   select(Compound.Name_old, Compound.Type) %>%
   rename(Precursor.Ion.Name = Compound.Name_old)
 
-Which.Cmpds <- Complete.Dataset %>%
+Which.AA.df <- Complete.Dataset %>%
   mutate(Precursor.Ion.Name = as.character(Precursor.Ion.Name)) %>%
   left_join(Standards) %>%
   filter(Compound.Type == "Amino Acid") %>%
@@ -74,7 +66,7 @@ Which.Cmpds <- Complete.Dataset %>%
   ) %>%
   ungroup()
 
-which.compounds <- ggplot(Which.Cmpds, aes(x = reorder(Precursor.Ion.Name, -Percent.Present),
+which.AA <- ggplot(Which.AA.df, aes(x = reorder(Precursor.Ion.Name, -Percent.Present),
                         y = Percent.Present)) +
   facet_wrap(~Size.Fraction + Eddy) +
   geom_bar(position = "dodge", stat = "identity") +
@@ -82,10 +74,34 @@ which.compounds <- ggplot(Which.Cmpds, aes(x = reorder(Precursor.Ion.Name, -Perc
   theme(axis.text.x = element_text(angle = 90, vjust = 0.25)) +
   scale_x_discrete(name ="Precursor.Ion.Name") +
   scale_y_continuous(name = "Percent of Samples Present in Dataset") 
-ggsave("figures/Which.Compounds.Present.png")
+ggsave("figures/Which.AA.png", width = 9, height = 7)
+
+Which.Cmpds.df <- Complete.Dataset %>%
+  group_by(Precursor.Ion.Name, Size.Fraction) %>%
+  mutate(
+    Number.Of.Samples = n(),
+    Number.Missing = sum(is.na(Area.with.QC)),
+    Percent.Present = 1 - (sum(is.na(Area.with.QC))/Number.Of.Samples),
+    Over.Half.Missing = ifelse(Percent.Present >= 0.5, FALSE, TRUE)
+  ) %>%
+  ungroup()
+
+which.compounds <- ggplot(Which.Cmpds.df, aes(x = reorder(Precursor.Ion.Name, -Percent.Present),
+                        y = Percent.Present)) +
+  facet_wrap(~Size.Fraction + Eddy) +
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_discrete(guide = "none") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.25)) +
+  scale_x_discrete(name ="Precursor.Ion.Name") +
+  scale_y_continuous(name = "Percent of Samples Present in Dataset") 
+ggsave("figures/Which.Cmpds.png", width = 9, height = 7)
 ```
 
-![](figures/Which.Compounds.Present.png)
+![](figures/Which.Cmpds.png)
+
+### Which amino acids exist in which size fraction?
+
+![](figures/Which.AA.png)
 
 ### Which compounds were *completely* in one or the other size fraction?
 ```{r, include=FALSE}
@@ -137,10 +153,12 @@ AllSamplesPresent <- function(df, EddyDirection) {
     filter(Missing == 0) %>%
     select(Precursor.Ion.Name) %>%
     unique()
+  
   return(samples.present)
 }
-WhichCompoundsTableCyc <- AllSamplesPresent(Complete.Dataset, "Cyclonic, Both Size Fractions")
-WhichCompoundsTableAntiCyc <- AllSamplesPresent(Complete.Dataset, "Anticyclonic, Both Size Fractions")
+
+WhichCompoundsTableCyc <- AllSamplesPresent(Complete.Dataset, "Cyclonic")
+WhichCompoundsTableAntiCyc <- AllSamplesPresent(Complete.Dataset, "Anticyclonic")
 
 kable(WhichCompoundsTableCyc, caption = "Cyclonic")
 kable(WhichCompoundsTableAntiCyc, caption = "Anticyclonic")
@@ -178,6 +196,7 @@ DSWproportions <- Complete.Dataset.Avg %>%
   mutate(Precursor.Ion.Name = as.character(Precursor.Ion.Name)) %>%
   left_join(Standards) %>%
   filter(!is.na(Compound.Type)) %>%
+  # unite(Grouping.ID, Size.Fraction:Eddy) %>%
   filter(Eddy == "Anticyclonic",
          Size.Fraction == "Large.Filter")%>%
   group_by(Binned.Group, Compound.Type) %>%
@@ -201,6 +220,7 @@ DSWproportions.with.Factor$Binned.Group <- factor(DSWproportions.with.Factor$Bin
 
 DSW.plot <- ggplot(DSWproportions.with.Factor, aes(x = Binned.Group, y = Sum.per.CT, fill = Compound.Type)) +
   geom_bar(stat = "identity", position = "fill") +
+  # facet_wrap(~Grouping.ID) +
   theme(axis.text.x = element_text(angle = 90)) +
   scale_fill_brewer(palette = "Dark2") +
   ggtitle("Deep Sea Water Proportions")
@@ -259,7 +279,11 @@ SF.Ratios.Plot <- Size.Fraction.Ratios %>%
   group_split() 
 
 names(SF.Ratios.Plot) <- unique(Size.Fraction.Ratios$Binned.Group)
+```
 
+### Anticyclonic proportions
+
+```{r, include=TRUE}
 plotlist <- lapply(SF.Ratios.Plot, plotchart)
 ```
 
@@ -316,7 +340,9 @@ Anti_Small <- ANOVAByGroup(Vitamin.Complete.Set, "SmallFilter_Anticyclonic") %>%
   filter(AnovaSig == TRUE) 
 Anti_Large <- ANOVAByGroup(Vitamin.Complete.Set, "LargeFilter_Anticyclonic") %>%
   filter(AnovaSig == TRUE) 
+```
 
+```{r, include=TRUE}
 common <- Reduce(intersect, list(Cyc_Large$Mass.Feature, Cyc_Small$Mass.Feature,
                                  Anti_Large$Mass.Feature, Anti_Small$Mass.Feature))
 print(common)
@@ -329,7 +355,15 @@ Tryptophan.plot <- ggplot(Tryptophan, aes(x = SampID, y = Area.with.QC, fill = S
   geom_boxplot() +
   scale_fill_grey() +
   theme(axis.text.x = element_text(angle = 90)) +
-  ggtitle("Tryptophan")
+  ggtitle("Tryptophan, free scales")
 print(Tryptophan.plot)
+
+Tryptophan.plot2 <- ggplot(Tryptophan, aes(x = SampID, y = Area.with.QC, fill = SampID)) +
+  facet_wrap(~ Grouping.ID) +
+  geom_boxplot() +
+  scale_fill_grey() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  ggtitle("Tryptophan, fixed scales")
+print(Tryptophan.plot2)
 
 ```

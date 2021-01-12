@@ -145,6 +145,7 @@ Area.RP.Cyano <- Area_Cyano_B12.Incubations
 Mz.RP.Cyano   <- Mz_Cyano_B12.Incubations
 RT.RP.Cyano   <- RT_Cyano_B12.Incubations
 SN.RP.Cyano   <- SN_Cyano_B12.Incubations
+Area.TrigHomarine.RP.Cyano <- Area_HILIC.POS_B12.Incubations_Homarine_Trigonelline_UpdatedPeakAreas
 
 # MSDial HILIC variables: 
 # Area.positive <- Area_HILICPos_Example
@@ -159,6 +160,7 @@ SN.RP.Cyano   <- SN_Cyano_B12.Incubations
 
 print(paste(file.pattern, software.pattern, "variables assigned."))
 ```
+
 
 Check if dataset is MSDial, rearrange if so, and export.
 ```{r Dataset rearrangement, include = TRUE}

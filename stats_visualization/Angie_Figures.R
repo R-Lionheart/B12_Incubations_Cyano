@@ -1,3 +1,4 @@
+library(gridExtra)
 library(patchwork)
 library(tidyverse)
 
@@ -85,3 +86,24 @@ trypto <- ggplot(Tryptophan, aes(x = SampID, y = Area.with.QC, fill = SampID)) +
   scale_fill_grey() +
   ggtitle("Tryptophan")
 print(trypto)
+
+PlotAllCompounds <- function (df) {
+  all.plots <- ggplot(df, aes(x = SampID, y = Area.with.QC, fill = SampID)) +
+    facet_wrap(~ Grouping.ID, scales = "free") +
+    geom_boxplot() +
+    scale_fill_grey() +
+    theme(axis.text.x = element_text(angle = 90)) +
+    ggtitle(paste(unique(df[[1]])))
+  
+  return(all.plots)
+}
+
+to.plot <- Vitamins.Complete.Set %>%
+  group_by(Precursor.Ion.Name) %>%
+  group_split()
+
+plotlist <- lapply(to.plot, PlotAllCompounds)
+
+pdf("~/Downloads/B12Incubations_Cyano_AllCompounds.pdf")
+invisible(lapply(plotlist, print))
+dev.off()
