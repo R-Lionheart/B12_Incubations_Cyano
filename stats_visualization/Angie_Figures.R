@@ -104,6 +104,6 @@ to.plot <- Vitamins.Complete.Set %>%
 
 plotlist <- lapply(to.plot, PlotAllCompounds)
 
-pdf("~/Downloads/B12Incubations_Cyano_AllCompounds.pdf")
+pdf("~/Downloads/B12Incubations_Cyano_AllCompounds_withHomarineTrigonneline.pdf")
 invisible(lapply(plotlist, print))
 dev.off()
