@@ -1,6 +1,3 @@
-# Drop extra columns in homarine and trigonnelline sheet
-Area.TrigHomarine.RP.Cyano <- Area.TrigHomarine.RP.Cyano %>%
-  select(-contains("NA"))
 # Set header, filter unknowns ---------------------------------------
 columns.to.drop <- c('Average.Rt.min.', 'Formula', 'Ontology', 'INCHIKEY', 'SMILES', 
                      'Isotope.tracking.parent.ID', 'Isotope.tracking.weight.number',
@@ -69,12 +66,9 @@ if (TRUE %in% grepl("positive|negative", names(.GlobalEnv), ignore.case = TRUE))
   Mz   <- RearrangeDatasets(Mz.RP.Cyano, parameter = "Mz.Value")
   RT   <- RearrangeDatasets(RT.RP.Cyano, parameter = "RT.Value")
   SN   <- RearrangeDatasets(SN.RP.Cyano, parameter = "SN.Value")
-  Area2 <- RearrangeDatasets(Area.TrigHomarine.RP.Cyano, parameter = "Area.Value") %>%
-    select(-c("Manually.modified.for.quantification", "Manually.modified.for.annotation"))
 
   # Combine to one dataset
   combined.final <- Area %>%
-    rbind(Area2) %>%
     left_join(Mz) %>%
     left_join(SN) %>%
     left_join(RT) %>%

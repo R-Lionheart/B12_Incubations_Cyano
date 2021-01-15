@@ -13,6 +13,8 @@ Vitamins_1500QC <- read.csv("data_processed/Skyline_QE_QC_Output_Vitamins_1500QC
                      TruePooWeek3|TruePooWeek4|DSW700m|Process")) %>%
   mutate(QC.Level = "1500",
          Dataset = "Vitamins") %>%
+  mutate(Area.with.QC = ifelse(str_detect(all.Flags, "Blank.Flag"), 
+                               NA, Area.with.QC)) %>%
   select(Replicate.Name, Precursor.Ion.Name, Area, Area.with.QC, QC.Level, Dataset)
 
 # Munge full Incubations dataset
@@ -25,8 +27,10 @@ Incubations <- read.csv("data_processed/MSDial_QE_QC_Output_B12-Incubations.csv"
                      TruePooWeek3|TruePooWeek4|DSW700m|Process")) %>%
   rename(Precursor.Ion.Name = Metabolite.Name,
          Area = Area.Value) %>%
-  mutate(QC.Level = "5000",
+  mutate(QC.Level = "10000",
          Dataset = "Incubations") %>%
+  mutate(Area.with.QC = ifelse(str_detect(all.Flags, "Blank.Flag"), 
+                               NA, Area.with.QC)) %>%
   select(Replicate.Name, Precursor.Ion.Name, Area, Area.with.QC, QC.Level, Dataset)
 
 

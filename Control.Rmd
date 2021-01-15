@@ -87,10 +87,10 @@ The matching.pattern and software.pattern variables should not be changed by the
 
 ```{r Pattern matching, include = TRUE}
 # MSDial
-software.pattern <- "MSDial"
+# software.pattern <- "MSDial"
 
 # Skyline
-# software.pattern <- "Skyline"
+software.pattern <- "Skyline"
 
 # QE
 instrument.pattern <- "QE"
@@ -101,12 +101,12 @@ instrument.pattern <- "QE"
 #######
 
 # Cyano Skyline
-# file.pattern <- "Vitamins"
-# matching.pattern <- "RP.Cyano"
+file.pattern <- "Vitamins"
+matching.pattern <- "RP.Cyano"
 
 #Cyano MSDial
-file.pattern <- "B12-Incubations"
-matching.pattern <- "RP.Cyano"
+# file.pattern <- "B12-Incubations"
+# matching.pattern <- "RP.Cyano"
 
 #######
 
@@ -138,14 +138,13 @@ Comment or uncomment the block of variable names appropriate for your run.
 # Comment out the run not being used.
 
 # Skyline Cyano variables:
-# skyline.RP.Cyano <- B12_Incubations_Vitamins_August2020
+skyline.RP.Cyano <- B12_Incubations_Vitamins_August2020
 
 # MSDial Cyano variables: 
-Area.RP.Cyano <- Area_Cyano_B12.Incubations
-Mz.RP.Cyano   <- Mz_Cyano_B12.Incubations
-RT.RP.Cyano   <- RT_Cyano_B12.Incubations
-SN.RP.Cyano   <- SN_Cyano_B12.Incubations
-Area.TrigHomarine.RP.Cyano <- Area_HILIC.POS_B12.Incubations_Homarine_Trigonelline_UpdatedPeakAreas
+# Area.RP.Cyano <- Area_Cyano_B12.Incubations
+# Mz.RP.Cyano   <- Mz_Cyano_B12.Incubations
+# RT.RP.Cyano   <- RT_Cyano_B12.Incubations
+# SN.RP.Cyano   <- SN_Cyano_B12.Incubations
 
 # MSDial HILIC variables: 
 # Area.positive <- Area_HILICPos_Example
@@ -214,21 +213,21 @@ The numbers will change depending on whether you are analyzing HILIC vs Cyano da
 ```{r QC parameters, include = TRUE}
 # QE + TQS QC parameters
 
-# These QC conditions are modified to reflect the Vitamins run. Lower area and height min.
-# area.min   <- 1500 # HILIC - 1000, Cyano - 5000
-# RT.flex    <- 0.2 # HILIC +/- 0.4 min, Cyano +/- 0.2 min
-# blk.thresh <- 0.2 # HILIC +/- 0.3, Cyano +/- 0.2
-# SN.min     <- 4 # HILIC - 4, Cyano - 4
-# height.max <- 1.0e8
-# height.min <- 1000
-
-# These QC conditions are for the rest of the Cyano run, and reflect ordinary QC levels. 
-area.min   <- 5000 # HILIC - 1000, Cyano - 5000
+# These QC conditions are modified to reflect the Vitamins run. Lower area and height min, and a modified blk.thresh
+area.min   <- 1500 # HILIC - 1000, Cyano - 5000
 RT.flex    <- 0.2 # HILIC +/- 0.4 min, Cyano +/- 0.2 min
-blk.thresh <- 0.2 # HILIC +/- 0.3, Cyano +/- 0.2
+blk.thresh <- 3 # HILIC +/- 0.3, Cyano +/- 0.2
 SN.min     <- 4 # HILIC - 4, Cyano - 4
 height.max <- 1.0e8
 height.min <- 1000
+
+# These QC conditions have been modified to be more stringent, note the area.min and blk.thresh!
+# area.min   <- 10000 # HILIC - 1000, Cyano - 5000
+# RT.flex    <- 0.2 # HILIC +/- 0.4 min, Cyano +/- 0.2 min
+# blk.thresh <- 3 # HILIC +/- 0.3, Cyano +/- 0.2
+# SN.min     <- 4 # HILIC - 4, Cyano - 4
+# height.max <- 1.0e8
+# height.min <- 1000
 
 print("Parameter values assigned.")
 ```
